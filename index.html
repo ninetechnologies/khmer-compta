@@ -229,6 +229,22 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   .kpi-card{padding:12px;}
   .kpi-value{font-size:20px;}
   .hamburger{display:flex;}
+  /* Toutes les sections côte à côte → colonne unique */
+  .inline-grid-chart,
+  .inline-grid-2col,
+  .inline-grid-3col,
+  .rapport-grid,
+  .tva-summary,
+  .form-grid{grid-template-columns:1fr!important;max-width:100%!important;}
+  /* Grids inline sans classe */
+  [style*="grid-template-columns:1fr 1fr"],
+  [style*="grid-template-columns:1fr 300px"],
+  [style*="grid-template-columns:1fr 1fr 1fr"]{grid-template-columns:1fr!important;}
+  /* Tableaux scrollables */
+  .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+  /* Évite tout débordement horizontal */
+  .main-content *{max-width:100%;box-sizing:border-box;}
+  .card{overflow:hidden;}
 }</style>
 </head>
 <body>
