@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Khmer Compta · Ô Petit Cambodge</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --bg:#05050D;--bg-card:#0D0D1C;--bg-sidebar:#070711;--bg-input:#13131F;
+  --gold:#C9A84C;--gold-light:#E2C876;--gold-faint:rgba(201,168,76,0.08);
+  --teal:#1B9978;--teal-light:#2EC99E;
+  --text:#EDE8DF;--text-muted:#686888;--text-sec:#9898B8;
+  --success:#2EC99E;--danger:#FF4D6A;--warning:#F5A623;--info:#5AB3FF;
+  --border:rgba(201,168,76,0.12);--border-h:rgba(201,168,76,0.30);
+  --sidebar-w:240px;--r:12px;--rs:8px;
+}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+
+/* LOGIN */
+#login-screen{position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:1000;flex-direction:column;}
+.login-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:48px 40px;width:360px;text-align:center;}
+.login-logo{font-family:'Playfair Display',serif;font-size:30px;color:var(--gold);margin-bottom:4px;}
+.login-sub{font-size:11px;color:var(--text-muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:40px;}
+.pin-dots{display:flex;gap:14px;justify-content:center;margin-bottom:32px;}
+.pin-dot{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--border-h);background:transparent;transition:all .15s;}
+.pin-dot.filled{background:var(--gold);border-color:var(--gold);box-shadow:0 0 12px rgba(201,168,76,.4);}
+.pin-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.pin-btn{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Sans',sans-serif;font-size:20px;font-weight:500;padding:16px;cursor:pointer;transition:all .15s;}
+.pin-btn:hover{background:rgba(201,168,76,.1);border-color:var(--border-h);}
+.pin-btn:active{transform:scale(.96);}
+.pin-btn.del{font-size:14px;color:var(--text-muted);}
+.pin-err{color:var(--danger);font-size:12px;margin-top:16px;height:16px;}
+
+/* APP */
+#app{display:none;height:100vh;}
+#app.visible{display:flex;}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar-w);background:var(--bg-sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;}
+.sidebar-brand{padding:24px 20px 16px;border-bottom:1px solid var(--border);}
+.brand-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--gold);line-height:1.2;}
+.brand-sub{font-size:10px;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;}
+.nav-section{padding:12px 12px 0;}
+.nav-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:0 8px;margin-bottom:6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--rs);cursor:pointer;color:var(--text-sec);font-size:13px;transition:all .15s;margin-bottom:2px;border-left:2px solid transparent;}
+.nav-item:hover{background:var(--gold-faint);color:var(--text);}
+.nav-item.active{background:var(--gold-faint);color:var(--gold);font-weight:500;border-left-color:var(--gold);padding-left:10px;}
+.nav-icon{width:16px;height:16px;flex-shrink:0;opacity:.7;}
+.nav-item.active .nav-icon{opacity:1;}
+
+/* MAIN */
+.main-content{flex:1;overflow-y:auto;padding:28px 32px;background:var(--bg);}
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:24px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;font-weight:500;line-height:1.2;}
+.page-sub{font-size:13px;color:var(--text-muted);margin-top:4px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:var(--rs);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;border:none;}
+.btn-gold{background:var(--gold);color:#05050D;}
+.btn-gold:hover{background:var(--gold-light);transform:translateY(-1px);}
+.btn-outline{background:transparent;border:1px solid var(--border-h);color:var(--text-sec);}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold);}
+.btn-danger{background:rgba(255,77,106,.1);border:1px solid rgba(255,77,106,.3);color:var(--danger);}
+.btn-danger:hover{background:rgba(255,77,106,.2);}
+.btn-success{background:rgba(46,201,158,.1);border:1px solid rgba(46,201,158,.3);color:var(--success);}
+.btn-info{background:rgba(90,179,255,.1);border:1px solid rgba(90,179,255,.3);color:var(--info);}
+.btn-sm{padding:7px 12px;font-size:12px;}
+
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:24px;}
+.kpi-grid-4{grid-template-columns:repeat(4,1fr);}
+.kpi-grid-3{grid-template-columns:repeat(3,1fr);}
+.kpi-card{background:var(--bg-card);border:1px solid rgba(201,168,76,.1);border-radius:var(--r);padding:18px;position:relative;overflow:hidden;}
+.kpi-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--gold);opacity:.3;}
+.kpi-card.hl::before{opacity:1;}
+.kpi-card.kpi-danger::before{background:var(--danger);}
+.kpi-card.kpi-success::before{background:var(--success);}
+.kpi-card.kpi-info::before{background:var(--info);}
+.kpi-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;}
+.kpi-value{font-family:'Playfair Display',serif;font-size:24px;font-weight:500;line-height:1;}
+.kpi-sub{font-size:11px;color:var(--text-muted);margin-top:6px;}
+.kpi-trend{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;margin-top:6px;}
+.trend-up{background:rgba(46,201,158,.1);color:var(--success);}
+.trend-dn{background:rgba(255,77,106,.1);color:var(--danger);}
+.trend-neu{background:rgba(201,168,76,.1);color:var(--gold);}
+
+/* PROGRESS BAR */
+.prog-wrap{margin-top:10px;}
+.prog-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:2px;transition:width .6s ease;background:var(--gold);}
+
+/* CARDS */
+.card{background:var(--bg-card);border:1px solid rgba(201,168,76,.1);border-radius:var(--r);padding:22px;margin-bottom:18px;}
+.card-title{font-family:'Playfair Display',serif;font-size:17px;margin-bottom:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+
+/* ALERT */
+.alert{border-radius:var(--rs);padding:14px 18px;margin-bottom:18px;font-size:13px;display:flex;align-items:center;gap:12px;}
+.alert-warning{background:rgba(245,166,35,.08);border:1px solid rgba(245,166,35,.25);color:var(--warning);}
+.alert-danger{background:rgba(255,77,106,.08);border:1px solid rgba(255,77,106,.25);color:var(--danger);}
+.alert-success{background:rgba(46,201,158,.08);border:1px solid rgba(46,201,158,.25);color:var(--success);}
+.alert-info{background:rgba(90,179,255,.08);border:1px solid rgba(90,179,255,.25);color:var(--info);}
+
+/* FORM */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.form-group.full{grid-column:1/-1;}
+.form-label{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px;}
+.form-ctrl{width:100%;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 14px;transition:border-color .15s;outline:none;}
+.form-ctrl:focus{border-color:var(--gold);}
+.form-ctrl option{background:#0D0D1C;}
+.quick-amounts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.quick-btn{background:var(--bg-input);border:1px solid var(--border);border-radius:20px;color:var(--text-sec);font-size:13px;font-weight:500;padding:5px 14px;cursor:pointer;transition:all .15s;}
+.quick-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;}
+.data-table th{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-muted);padding:0 12px 12px;text-align:left;font-weight:500;border-bottom:1px solid var(--border);}
+.data-table td{padding:11px 12px;border-bottom:1px solid rgba(201,168,76,.04);color:var(--text-sec);font-size:13px;}
+.data-table tr:hover td{background:var(--gold-faint);color:var(--text);}
+.data-table tr:last-child td{border-bottom:none;}
+.ap{color:var(--success);font-weight:500;}
+.an{color:var(--danger);font-weight:500;}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:500;}
+.b-midi{background:rgba(46,201,158,.1);color:var(--success);}
+.b-soir{background:rgba(201,168,76,.1);color:var(--gold);}
+.b-rec{background:rgba(46,201,158,.1);color:var(--success);}
+.b-dep{background:rgba(255,77,106,.1);color:var(--danger);}
+.b-paye{background:rgba(46,201,158,.1);color:var(--success);}
+.b-attente{background:rgba(245,166,35,.1);color:var(--warning);}
+.b-litige{background:rgba(255,77,106,.1);color:var(--danger);}
+.b-place{background:rgba(90,179,255,.1);color:var(--info);}
+.b-emporter{background:rgba(139,92,246,.1);color:#A78BFA;}
+.b-livraison{background:rgba(245,166,35,.1);color:var(--warning);}
+.b-weekend{background:rgba(201,168,76,.1);color:var(--gold);}
+.b-ferie{background:rgba(255,77,106,.1);color:var(--danger);}
+
+/* TVA */
+.tva-summary{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:20px;}
+.tva-box{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--r);padding:18px;text-align:center;}
+.tva-lbl{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-muted);margin-bottom:8px;}
+.tva-amt{font-family:'Playfair Display',serif;font-size:22px;}
+.tva-box.solde .tva-amt{color:var(--danger);}
+.tva-box.credit .tva-amt{color:var(--success);}
+
+/* FILTER BAR */
+.filter-bar{display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap;}
+.filter-bar input,.filter-bar select{background:var(--bg-input);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;outline:none;transition:border-color .15s;}
+.filter-bar input:focus,.filter-bar select:focus{border-color:var(--gold);}
+.filter-bar select option{background:#0D0D1C;}
+
+/* CHART */
+.chart-wrap{position:relative;height:220px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:500;display:none;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg-card);border:1px solid rgba(201,168,76,.25);border-radius:16px;padding:28px;width:520px;max-width:90vw;max-height:90vh;overflow-y:auto;}
+.modal-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold);margin-bottom:22px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;}
+
+/* CAISSE */
+.caisse-hero{background:linear-gradient(135deg,rgba(201,168,76,.06),rgba(27,153,120,.04));border:1px solid rgba(201,168,76,.2);border-radius:var(--r);padding:28px;margin-bottom:18px;text-align:center;}
+
+/* RECURRENTS */
+.rec-item{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--rs);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:10px;}
+.rec-item.inactive{opacity:.45;}
+.toggle{width:36px;height:20px;border-radius:10px;background:var(--bg-input);border:1px solid var(--border);cursor:pointer;position:relative;flex-shrink:0;transition:background .2s;}
+.toggle.on{background:var(--teal);}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:12px;height:12px;border-radius:50%;background:#fff;transition:left .2s;}
+.toggle.on::after{left:19px;}
+
+/* PHOTO PREVIEW */
+.photo-preview{width:100%;max-height:120px;object-fit:cover;border-radius:var(--rs);margin-top:8px;border:1px solid var(--border);cursor:pointer;}
+
+/* RAPPORT */
+.rapport-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--bg-card);border:1px solid var(--border-h);border-radius:var(--rs);padding:12px 20px;color:var(--text);font-size:13px;z-index:900;transform:translateY(80px);opacity:0;transition:all .3s;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-color:var(--success);color:var(--success);}
+.toast.error{border-color:var(--danger);color:var(--danger);}
+
+/* SIDEBAR FOOTER */
+.sidebar-bottom{margin-top:auto;border-top:1px solid var(--border);}
+.sidebar-credit{padding:14px 16px;font-size:11px;color:var(--text-muted);text-align:center;line-height:1.8;border-bottom:1px solid var(--border);}
+.logout-btn{display:flex;align-items:center;gap:8px;color:var(--text-muted);font-size:13px;cursor:pointer;padding:12px 16px;transition:color .15s;}
+.logout-btn:hover{color:var(--danger);}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border-h);border-radius:2px;}
+
+@media(max-width:900px){
+  .kpi-grid{grid-template-columns:repeat(2,1fr);}
+  .kpi-grid-5{grid-template-columns:repeat(2,1fr);}
+  .form-grid{grid-template-columns:1fr;}
+  .form-group.full{grid-column:1;}
+  .tva-summary{grid-template-columns:1fr;}
+  .rapport-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div style="text-align:center;margin-bottom:36px;">
+    <div style="font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-muted);margin-bottom:8px;">Nine Technologies</div>
+    <div style="width:40px;height:2px;background:var(--gold);margin:0 auto;"></div>
+  </div>
+  <div class="login-card">
+    <div class="login-logo">Khmer Compta</div>
+    <div style="display:flex;gap:0;border:1px solid var(--border);border-radius:var(--rs);overflow:hidden;margin-bottom:20px;">
+      <button id="btn-cambodge" onclick="selectRestau('cambodge')" style="flex:1;padding:10px;background:var(--gold);color:#05050D;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s;">🍜 Ô Petit Cambodge</button>
+      <button id="btn-bayon" onclick="selectRestau('bayon')" style="flex:1;padding:10px;background:var(--bg-input);color:var(--text-sec);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .15s;">🏛️ Ô Petit Bayon</button>
+    </div>
+    <div class="login-sub" id="login-restau-label">Ô Petit Cambodge · Gestion Financière</div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+    <div class="pin-pad">
+      <button class="pin-btn" onclick="pinPress(1)">1</button><button class="pin-btn" onclick="pinPress(2)">2</button><button class="pin-btn" onclick="pinPress(3)">3</button>
+      <button class="pin-btn" onclick="pinPress(4)">4</button><button class="pin-btn" onclick="pinPress(5)">5</button><button class="pin-btn" onclick="pinPress(6)">6</button>
+      <button class="pin-btn" onclick="pinPress(7)">7</button><button class="pin-btn" onclick="pinPress(8)">8</button><button class="pin-btn" onclick="pinPress(9)">9</button>
+      <button class="pin-btn del" onclick="pinClear()">✕</button><button class="pin-btn" onclick="pinPress(0)">0</button><button class="pin-btn del" onclick="pinDelete()">⌫</button>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+    <div style="margin-top:16px;font-size:11px;color:var(--text-muted);">Code par défaut : <strong style="color:var(--gold)">1234</strong></div>
+  </div>
+</div>
+
+<!-- MODAL RECETTE -->
+<div class="modal-overlay" id="modal-rec">
+  <div class="modal">
+    <div class="modal-title" id="modal-rec-title">Nouvelle recette</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-ctrl" id="rec-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Service</label>
+        <select class="form-ctrl" id="rec-service">
+          <option value="midi">🌞 Midi</option>
+          <option value="soir">🌙 Soir</option>
+          <option value="jour">☀️ Journée complète</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Canal de vente</label>
+        <select class="form-ctrl" id="rec-canal" onchange="autoTVACanal()">
+          <option value="place">🍽️ Sur place (10%)</option>
+          <option value="emporter">📦 À emporter (5.5%)</option>
+          <option value="livraison">🛵 Livraison (5.5%)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Type de journée</label>
+        <select class="form-ctrl" id="rec-typejour">
+          <option value="semaine">📅 Semaine</option>
+          <option value="weekend">🎉 Weekend</option>
+          <option value="ferie">⭐ Férié / Événement</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Montant rapide</label>
+        <div class="quick-amounts">
+          <button class="quick-btn" onclick="setAmt(500)">500 €</button><button class="quick-btn" onclick="setAmt(750)">750 €</button><button class="quick-btn" onclick="setAmt(1000)">1 000 €</button>
+          <button class="quick-btn" onclick="setAmt(1250)">1 250 €</button><button class="quick-btn" onclick="setAmt(1500)">1 500 €</button><button class="quick-btn" onclick="setAmt(2000)">2 000 €</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Montant TTC (€)</label>
+        <input type="number" class="form-ctrl" id="rec-montant" placeholder="0.00" step="0.01" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mode de paiement</label>
+        <select class="form-ctrl" id="rec-mode">
+          <option value="carte">💳 Carte bancaire</option>
+          <option value="especes">💵 Espèces</option>
+          <option value="ticket">🎫 Tickets restaurant</option>
+          <option value="mixte">📊 Mixte</option>
+          <option value="uber">🛵 Uber Eats / Deliveroo</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Taux TVA</label>
+        <select class="form-ctrl" id="rec-tva">
+          <option value="10">10% — Sur place</option>
+          <option value="5.5">5.5% — À emporter</option>
+          <option value="20">20% — Boissons alcoolisées</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Nombre de couverts</label>
+        <input type="number" class="form-ctrl" id="rec-couverts" placeholder="0" min="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tag / commentaire</label>
+        <input type="text" class="form-ctrl" id="rec-note" placeholder="Groupe, événement, menu spécial...">
+      </div>
+    </div>
+    <div id="rec-edit-id" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-rec')">Annuler</button>
+      <button class="btn btn-gold" onclick="saveRecette()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DÉPENSE -->
+<div class="modal-overlay" id="modal-dep">
+  <div class="modal">
+    <div class="modal-title" id="modal-dep-title">Nouvelle dépense</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-ctrl" id="dep-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie</label>
+        <select class="form-ctrl" id="dep-cat">
+          <option value="matieres">🥬 Matières premières</option>
+          <option value="boissons">🍺 Boissons & alcools</option>
+          <option value="loyer">🏠 Loyer & charges locatives</option>
+          <option value="salaires">👥 Salaires & charges sociales</option>
+          <option value="energie">⚡ Énergie</option>
+          <option value="equipement">🔧 Équipement & entretien</option>
+          <option value="compta">📊 Comptable & frais admin</option>
+          <option value="marketing">📱 Marketing</option>
+          <option value="assurance">🛡️ Assurance</option>
+          <option value="pertes">⚠️ Pertes & casses</option>
+          <option value="divers">📦 Divers</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fournisseur</label>
+        <input type="text" class="form-ctrl" id="dep-fourn" placeholder="Nom du fournisseur">
+      </div>
+      <div class="form-group">
+        <label class="form-label">N° de facture</label>
+        <input type="text" class="form-ctrl" id="dep-facture" placeholder="FACT-2026-001">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Montant HT (€)</label>
+        <input type="number" class="form-ctrl" id="dep-ht" placeholder="0.00" step="0.01" oninput="calcTTC()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Taux TVA</label>
+        <select class="form-ctrl" id="dep-tva" onchange="calcTTC()">
+          <option value="20">20%</option><option value="10">10%</option>
+          <option value="5.5">5.5%</option><option value="0">0% — Exonéré</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Montant TTC (€)</label>
+        <input type="number" class="form-ctrl" id="dep-ttc" placeholder="0.00" step="0.01" oninput="calcHT()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mode de règlement</label>
+        <select class="form-ctrl" id="dep-mode">
+          <option value="virement">Virement bancaire</option><option value="prelevement">Prélèvement auto</option>
+          <option value="carte">Carte bancaire</option><option value="especes">Espèces</option><option value="cheque">Chèque</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Récurrence</label>
+        <select class="form-ctrl" id="dep-recurrence">
+          <option value="ponctuel">🔹 Ponctuelle</option>
+          <option value="mensuel">🔄 Mensuelle</option>
+          <option value="annuel">📅 Annuelle</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Statut de règlement</label>
+        <select class="form-ctrl" id="dep-statut">
+          <option value="paye">✅ Payé</option>
+          <option value="attente">⏳ En attente</option>
+          <option value="litige">⚠️ Litige</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Tag / commentaire</label>
+        <input type="text" class="form-ctrl" id="dep-note" placeholder="Description complémentaire...">
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Photo de facture</label>
+        <input type="file" class="form-ctrl" id="dep-photo" accept="image/*" onchange="previewPhoto(this)" style="padding:8px;">
+        <img id="dep-photo-preview" class="photo-preview" style="display:none;" onclick="document.getElementById('dep-photo').click()">
+      </div>
+    </div>
+    <div id="dep-edit-id" style="display:none;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-dep')">Annuler</button>
+      <button class="btn btn-gold" onclick="saveDepense()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL RÉCURRENT -->
+<div class="modal-overlay" id="modal-rec-charge">
+  <div class="modal">
+    <div class="modal-title">Charge récurrente</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Libellé</label>
+        <input type="text" class="form-ctrl" id="rch-label" placeholder="ex: Loyer mensuel">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie</label>
+        <select class="form-ctrl" id="rch-cat">
+          <option value="loyer">🏠 Loyer</option><option value="salaires">👥 Salaires</option>
+          <option value="energie">⚡ Énergie</option><option value="compta">📊 Comptable</option>
+          <option value="assurance">🛡️ Assurance</option><option value="matieres">🥬 Matières</option>
+          <option value="boissons">🍺 Boissons</option><option value="equipement">🔧 Équipement</option>
+          <option value="marketing">📱 Marketing</option><option value="divers">📦 Divers</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fournisseur</label>
+        <input type="text" class="form-ctrl" id="rch-fourn" placeholder="Nom du fournisseur">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Montant HT (€)</label>
+        <input type="number" class="form-ctrl" id="rch-ht" placeholder="0.00" step="0.01" oninput="calcRchTTC()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Taux TVA</label>
+        <select class="form-ctrl" id="rch-tva" onchange="calcRchTTC()">
+          <option value="20">20%</option><option value="10">10%</option>
+          <option value="5.5">5.5%</option><option value="0">0%</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Montant TTC (€)</label>
+        <input type="number" class="form-ctrl" id="rch-ttc" placeholder="0.00" step="0.01">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Mode de règlement</label>
+        <select class="form-ctrl" id="rch-mode">
+          <option value="prelevement">Prélèvement auto</option><option value="virement">Virement</option>
+          <option value="carte">Carte</option><option value="cheque">Chèque</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fréquence</label>
+        <select class="form-ctrl" id="rch-freq">
+          <option value="mensuel">🔄 Mensuelle</option>
+          <option value="annuel">📅 Annuelle</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-rec-charge')">Annuler</button>
+      <button class="btn btn-gold" onclick="saveRecCharge()">✓ Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CAISSE -->
+<div class="modal-overlay" id="modal-caisse">
+  <div class="modal">
+    <div class="modal-title">Clôture de caisse</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label class="form-label">Date</label>
+        <input type="date" class="form-ctrl" id="caisse-date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Fond de caisse (€)</label>
+        <input type="number" class="form-ctrl" id="caisse-fond" placeholder="200.00" step="0.01" oninput="calcEcart()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Réel comptabilisé (€)</label>
+        <input type="number" class="form-ctrl" id="caisse-reel" placeholder="0.00" step="0.01" oninput="calcEcart()">
+      </div>
+      <div class="form-group full" id="ecart-display" style="text-align:center;padding:14px;background:var(--bg-input);border-radius:var(--rs);display:none;">
+        <div style="font-size:11px;text-transform:uppercase;color:var(--text-muted);margin-bottom:4px;">Écart</div>
+        <div id="ecart-val" style="font-family:'Playfair Display',serif;font-size:24px;"></div>
+      </div>
+      <div class="form-group full">
+        <label class="form-label">Note</label>
+        <input type="text" class="form-ctrl" id="caisse-note" placeholder="Remarque...">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-outline" onclick="closeModal('modal-caisse')">Annuler</button>
+      <button class="btn btn-gold" onclick="saveCaisse()">✓ Clôturer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PHOTO -->
+<div class="modal-overlay" id="modal-photo">
+  <div class="modal" style="text-align:center;">
+    <img id="photo-full" style="max-width:100%;border-radius:var(--rs);">
+    <div style="margin-top:16px;"><button class="btn btn-outline" onclick="closeModal('modal-photo')">Fermer</button></div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app">
+  <aside class="sidebar">
+    <div class="sidebar-brand" style="cursor:pointer;" onclick="go('parametres')" title="Paramètres">
+      <div style="font-size:10px;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;" id="sidebar-restau-tag">Ô Petit Cambodge</div>
+      <div class="brand-name">Khmer Compta</div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">⚙️ Paramètres & sécurité</div>
+    </div>
+    <nav class="nav-section">
+      <div class="nav-label">Vue d'ensemble</div>
+      <div class="nav-item active" onclick="go('dashboard')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="14" y="3" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="3" y="14" width="7" height="7" rx="1" stroke-width="1.5"/><rect x="14" y="14" width="7" height="7" rx="1" stroke-width="1.5"/></svg>
+        Tableau de bord
+      </div>
+    </nav>
+    <nav class="nav-section" style="margin-top:6px;">
+      <div class="nav-label">Comptabilité</div>
+      <div class="nav-item" onclick="go('recettes')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Recettes
+      </div>
+      <div class="nav-item" onclick="go('depenses')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Dépenses
+      </div>
+      <div class="nav-item" onclick="go('caisse')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" stroke-width="1.5"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16" stroke-width="1.5"/></svg>
+        Caisse journalière
+      </div>
+      <div class="nav-item" onclick="go('recurrents')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Charges récurrentes
+      </div>
+    </nav>
+    <nav class="nav-section" style="margin-top:6px;">
+      <div class="nav-label">Fiscal</div>
+      <div class="nav-item" onclick="go('tva')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 14L15 8M9 8h6v6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="9" stroke-width="1.5"/></svg>
+        Suivi TVA
+      </div>
+      <div class="nav-item" onclick="go('rapports')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Rapports & Export
+      </div>
+    </nav>
+    <nav class="nav-section" style="margin-top:6px;">
+      <div class="nav-label">Compte</div>
+      <div class="nav-item" onclick="go('parametres')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" stroke-width="1.5"/><circle cx="12" cy="12" r="3" stroke-width="1.5"/></svg>
+        Paramètres & Sécurité
+      </div>
+    <div class="sidebar-bottom">
+      <div class="sidebar-credit">
+        Développé par<br><span style="color:var(--gold);">Nine Technologies</span><br>
+        <span style="font-size:10px;">07 80 19 30 96</span>
+      </div>
+      <div class="logout-btn" onclick="logout()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Se déconnecter
+      </div>
+    </div>
+  </aside>
+
+  <main class="main-content">
+
+    <!-- DASHBOARD -->
+    <section class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Tableau de bord</div>
+          <div class="page-sub" id="dash-date"></div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:12px;color:var(--text-muted);">Objectif CA :</span>
+            <input type="number" id="objectif-ca" class="form-ctrl" style="width:110px;padding:7px 10px;font-size:13px;" placeholder="ex: 18000" onchange="saveObjectif()">
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="openModal('modal-dep')">+ Dépense</button>
+          <button class="btn btn-gold btn-sm" onclick="openModal('modal-rec')">+ Recette</button>
+        </div>
+      </div>
+      <div id="dash-alerts"></div>
+      <div class="kpi-grid" id="kpi-main" style="grid-template-columns:repeat(5,1fr);">
+        <div class="kpi-card hl">
+          <div class="kpi-label">CA du jour</div>
+          <div class="kpi-value" id="k-jour">—</div>
+          <div class="kpi-sub" id="k-jour-s">—</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">CA du mois</div>
+          <div class="kpi-value" id="k-mois">—</div>
+          <div id="k-mois-prog" class="prog-wrap" style="display:none;">
+            <div class="prog-bar"><div class="prog-fill" id="prog-ca" style="width:0%"></div></div>
+            <div style="font-size:10px;color:var(--text-muted);margin-top:4px;" id="prog-ca-label"></div>
+          </div>
+          <div class="kpi-sub" id="k-mois-s" style="margin-top:4px;">—</div>
+        </div>
+        <div class="kpi-card kpi-danger">
+          <div class="kpi-label">Dépenses mois</div>
+          <div class="kpi-value" id="k-dep" style="color:var(--danger)">—</div>
+          <div class="kpi-sub" id="k-dep-s">—</div>
+        </div>
+        <div class="kpi-card kpi-success">
+          <div class="kpi-label">Marge estimée</div>
+          <div class="kpi-value" id="k-marge">—</div>
+          <div class="kpi-sub" id="k-marge-s">—</div>
+        </div>
+        <div class="kpi-card kpi-info">
+          <div class="kpi-label">Ticket moyen</div>
+          <div class="kpi-value" id="k-ticket">—</div>
+          <div class="kpi-sub" id="k-ticket-s">—</div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 300px;gap:18px;margin-bottom:18px;">
+        <div class="card">
+          <div class="card-title">
+            Chiffre d'affaires — 6 derniers mois
+            <select class="form-ctrl" id="ch-filter" style="width:auto;font-size:12px;padding:5px 10px;" onchange="updCharts()">
+              <option value="ca">CA TTC</option><option value="dep">Dépenses</option><option value="marge">Marge</option>
+            </select>
+          </div>
+          <div class="chart-wrap"><canvas id="ch-rev"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-title" style="font-size:14px;">Dépenses par catégorie</div>
+          <div class="chart-wrap" style="height:160px;"><canvas id="ch-dep"></canvas></div>
+          <div id="dep-legend" style="margin-top:10px;"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Dernières opérations</div>
+        <table class="data-table">
+          <thead><tr><th>Date</th><th>Type</th><th>Détail</th><th>Mode</th><th>Montant</th></tr></thead>
+          <tbody id="recent-ops"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- RECETTES -->
+    <section class="page" id="page-recettes">
+      <div class="page-header">
+        <div><div class="page-title">Recettes</div><div class="page-sub">Encaissements par service</div></div>
+        <button class="btn btn-gold" onclick="openModal('modal-rec')">+ Nouvelle recette</button>
+      </div>
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+        <div class="kpi-card"><div class="kpi-label">Total ce mois</div><div class="kpi-value" id="r-total" style="font-size:20px;">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Nb services saisis</div><div class="kpi-value" id="r-nb" style="font-size:20px;">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Ticket moyen</div><div class="kpi-value" id="r-moy" style="font-size:20px;">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">vs Mois N-1</div><div class="kpi-value" id="r-n1" style="font-size:20px;">—</div></div>
+      </div>
+      <div class="filter-bar">
+        <input type="month" id="r-month" onchange="renderRec()">
+        <select id="r-service" onchange="renderRec()"><option value="">Tous services</option><option value="midi">Midi</option><option value="soir">Soir</option></select>
+        <select id="r-canal" onchange="renderRec()"><option value="">Tous canaux</option><option value="place">Sur place</option><option value="emporter">À emporter</option><option value="livraison">Livraison</option></select>
+        <select id="r-typejour" onchange="renderRec()"><option value="">Tous jours</option><option value="semaine">Semaine</option><option value="weekend">Weekend</option><option value="ferie">Férié</option></select>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted);" id="r-count"></span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead><tr>
+            <th style="padding-left:18px;">Date</th><th>Service</th><th>Canal</th><th>Jour</th>
+            <th>Couverts</th><th>Mode</th><th>TVA</th><th>TTC</th><th>TVA coll.</th><th>Tag</th><th></th>
+          </tr></thead>
+          <tbody id="rec-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- DÉPENSES -->
+    <section class="page" id="page-depenses">
+      <div class="page-header">
+        <div><div class="page-title">Dépenses</div><div class="page-sub">Charges et achats professionnels</div></div>
+        <button class="btn btn-gold" onclick="openModal('modal-dep')">+ Nouvelle dépense</button>
+      </div>
+      <div class="kpi-grid kpi-grid-4" style="margin-bottom:20px;">
+        <div class="kpi-card"><div class="kpi-label">Total HT</div><div class="kpi-value" id="d-ht" style="font-size:20px;color:var(--danger);">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total TTC</div><div class="kpi-value" id="d-ttc" style="font-size:20px;color:var(--danger);">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">TVA déductible</div><div class="kpi-value" id="d-tva-ded" style="font-size:20px;color:var(--success);">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">En attente règlement</div><div class="kpi-value" id="d-attente" style="font-size:20px;color:var(--warning);">—</div></div>
+      </div>
+      <div class="filter-bar">
+        <input type="month" id="d-month" onchange="renderDep()">
+        <select id="d-cat" onchange="renderDep()">
+          <option value="">Toutes catégories</option><option value="matieres">Matières premières</option>
+          <option value="boissons">Boissons</option><option value="loyer">Loyer</option>
+          <option value="salaires">Salaires</option><option value="energie">Énergie</option>
+          <option value="equipement">Équipement</option><option value="compta">Comptable</option>
+          <option value="pertes">Pertes & casses</option><option value="divers">Divers</option>
+        </select>
+        <select id="d-statut" onchange="renderDep()">
+          <option value="">Tous statuts</option><option value="paye">Payé</option>
+          <option value="attente">En attente</option><option value="litige">Litige</option>
+        </select>
+        <select id="d-recurrence" onchange="renderDep()">
+          <option value="">Toutes récurrences</option><option value="ponctuel">Ponctuelle</option>
+          <option value="mensuel">Mensuelle</option><option value="annuel">Annuelle</option>
+        </select>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted);" id="d-count"></span>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead><tr>
+            <th style="padding-left:18px;">Date</th><th>Fournisseur</th><th>Catégorie</th>
+            <th>Récurrence</th><th>Statut</th><th>N° Fact.</th><th>HT</th><th>TVA</th><th>TTC</th><th>📷</th><th></th>
+          </tr></thead>
+          <tbody id="dep-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CAISSE -->
+    <section class="page" id="page-caisse">
+      <div class="page-header">
+        <div><div class="page-title">Caisse journalière</div><div class="page-sub">Contrôle de caisse en fin de journée</div></div>
+        <button class="btn btn-gold" onclick="openCaisse()">+ Nouvelle clôture</button>
+      </div>
+      <div class="kpi-grid kpi-grid-3" style="margin-bottom:20px;">
+        <div class="kpi-card"><div class="kpi-label">Clôtures ce mois</div><div class="kpi-value" id="cs-nb" style="font-size:20px;">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Écart total mois</div><div class="kpi-value" id="cs-ecart" style="font-size:20px;">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Dernier écart</div><div class="kpi-value" id="cs-last" style="font-size:20px;">—</div></div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="data-table">
+          <thead><tr>
+            <th style="padding-left:18px;">Date</th><th>Fond de caisse</th><th>Réel compté</th><th>Écart</th><th>Note</th><th></th>
+          </tr></thead>
+          <tbody id="caisse-tbody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CHARGES RÉCURRENTES -->
+    <section class="page" id="page-recurrents">
+      <div class="page-header">
+        <div><div class="page-title">Charges récurrentes</div><div class="page-sub">Injection automatique des charges fixes chaque mois</div></div>
+        <div style="display:flex;gap:10px;">
+          <button class="btn btn-success" onclick="injecterRecurrents()">↓ Injecter charges du mois</button>
+          <button class="btn btn-gold" onclick="openModal('modal-rec-charge')">+ Nouvelle charge</button>
+        </div>
+      </div>
+      <div id="alert-injection"></div>
+      <div class="kpi-grid kpi-grid-3" style="margin-bottom:20px;">
+        <div class="kpi-card"><div class="kpi-label">Charges actives</div><div class="kpi-value" id="rch-nb" style="font-size:20px;">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">Total mensuel estimé</div><div class="kpi-value" id="rch-total" style="font-size:20px;color:var(--danger);">—</div></div>
+        <div class="kpi-card"><div class="kpi-label">TVA déductible estimée</div><div class="kpi-value" id="rch-tva" style="font-size:20px;color:var(--success);">—</div></div>
+      </div>
+      <div id="rch-list"></div>
+    </section>
+
+    <!-- TVA -->
+    <section class="page" id="page-tva">
+      <div class="page-header">
+        <div><div class="page-title">Suivi TVA</div><div class="page-sub">Calcul automatique — prêt pour CA3</div></div>
+        <select class="form-ctrl" id="tva-period" style="width:auto;" onchange="renderTVA()"></select>
+      </div>
+      <div class="tva-summary" id="tva-summary"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;">
+        <div class="card">
+          <div class="card-title">TVA collectée (ventes)</div>
+          <table class="data-table"><thead><tr><th>Taux</th><th>Base HT</th><th>TVA</th></tr></thead><tbody id="tva-coll"></tbody></table>
+        </div>
+        <div class="card">
+          <div class="card-title">TVA déductible (achats)</div>
+          <table class="data-table"><thead><tr><th>Taux</th><th>Base HT</th><th>TVA</th></tr></thead><tbody id="tva-ded"></tbody></table>
+        </div>
+      </div>
+      <div class="card" style="border-color:rgba(201,168,76,.3);">
+        <div class="card-title" style="color:var(--gold);">
+          Récapitulatif déclaration CA3
+          <button class="btn btn-gold btn-sm" onclick="exportTVA()">↓ CSV</button>
+        </div>
+        <div id="tva-recap" style="font-size:14px;line-height:2.4;color:var(--text-sec);"></div>
+      </div>
+    </section>
+
+    <!-- RAPPORTS -->
+    <section class="page" id="page-rapports">
+      <div class="page-header">
+        <div><div class="page-title">Rapports & Export</div><div class="page-sub">Fichiers prêts pour votre expert-comptable</div></div>
+      </div>
+      <div style="margin-bottom:20px;" id="annual-kpi"></div>
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-title">Bilan annuel CA vs Dépenses</div>
+        <div class="chart-wrap" style="height:200px;"><canvas id="ch-annual"></canvas></div>
+      </div>
+      <div class="rapport-grid">
+        <div class="card" style="border-color:rgba(46,201,158,.2);">
+          <div class="card-title"><span>Bilan mensuel complet</span><span style="font-size:12px;font-family:'DM Sans';color:var(--success);">CSV</span></div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;">Recettes + dépenses du mois, TVA ventilée, prêt comptable.</p>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <input type="month" class="form-ctrl" id="ex-bilan" style="width:auto;">
+            <button class="btn btn-gold" onclick="exportBilan()">↓ Télécharger</button>
+          </div>
+        </div>
+        <div class="card" style="border-color:rgba(90,179,255,.2);">
+          <div class="card-title"><span>Export FEC</span><span style="font-size:12px;font-family:'DM Sans';color:var(--info);">TXT</span></div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;">Fichier des Écritures Comptables — format légal pour votre expert-comptable.</p>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <input type="month" class="form-ctrl" id="ex-fec" style="width:auto;">
+            <button class="btn btn-info" onclick="exportFEC()">↓ FEC</button>
+          </div>
+        </div>
+        <div class="card" style="border-color:rgba(255,77,106,.2);">
+          <div class="card-title"><span>Export recettes</span><span style="font-size:12px;font-family:'DM Sans';color:var(--danger);">CSV</span></div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;">Historique complet avec canaux, TVA, couverts.</p>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <input type="month" class="form-ctrl" id="ex-rec" style="width:auto;">
+            <button class="btn btn-danger" onclick="exportRec()">↓ Recettes</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">Sauvegarde & restauration</div>
+          <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;line-height:1.7;">Sauvegardez toutes vos données en JSON, ou restaurez depuis une sauvegarde.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <button class="btn btn-outline" onclick="backup()">↓ Sauvegarder JSON</button>
+            <label class="btn btn-outline" style="cursor:pointer;">↑ Restaurer <input type="file" accept=".json" onchange="restore(event)" style="display:none;"></label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARAMÈTRES -->
+    <section class="page" id="page-parametres">
+      <div class="page-header">
+        <div><div class="page-title">Paramètres & Sécurité</div><div class="page-sub">Configuration de l'application</div></div>
+      </div>
+
+      <!-- Sélecteur restaurant -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-title">🏪 Restaurant actif</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:0;">
+          <div id="card-cambodge" onclick="switchRestau('cambodge')" style="background:var(--bg-input);border:2px solid var(--gold);border-radius:var(--r);padding:20px;cursor:pointer;text-align:center;transition:all .2s;">
+            <div style="font-size:28px;margin-bottom:8px;">🍜</div>
+            <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);">Ô Petit Cambodge</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Restaurant cambodgien</div>
+            <div id="badge-cambodge" style="display:inline-block;margin-top:10px;background:var(--gold);color:#05050D;font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;">✓ Actif</div>
+          </div>
+          <div id="card-bayon" onclick="switchRestau('bayon')" style="background:var(--bg-input);border:2px solid var(--border);border-radius:var(--r);padding:20px;cursor:pointer;text-align:center;transition:all .2s;">
+            <div style="font-size:28px;margin-bottom:8px;">🏛️</div>
+            <div style="font-family:'Playfair Display',serif;font-size:16px;color:var(--text);">Ô Petit Bayon</div>
+            <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">Restaurant cambodgien</div>
+            <div id="badge-bayon" style="display:none;margin-top:10px;background:var(--gold);color:#05050D;font-size:11px;font-weight:600;padding:3px 12px;border-radius:20px;">✓ Actif</div>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">Chaque restaurant a ses propres données, son propre code PIN et son propre objectif CA. Basculer d'un restaurant à l'autre recharge toutes les données correspondantes.</p>
+      </div>
+
+      <!-- Sécurité PIN -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-title">🔐 Modifier le code PIN</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;max-width:600px;">
+          <div class="form-group">
+            <label class="form-label">PIN actuel</label>
+            <input type="password" class="form-ctrl" id="pin-actuel" maxlength="4" placeholder="••••" inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Nouveau PIN</label>
+            <input type="password" class="form-ctrl" id="pin-nouveau" maxlength="4" placeholder="••••" inputmode="numeric">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirmer PIN</label>
+            <input type="password" class="form-ctrl" id="pin-confirm" maxlength="4" placeholder="••••" inputmode="numeric">
+          </div>
+        </div>
+        <div style="margin-top:14px;display:flex;align-items:center;gap:12px;">
+          <button class="btn btn-gold" onclick="changePin()">✓ Changer le code PIN</button>
+          <div id="pin-msg" style="font-size:13px;"></div>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">Le PIN doit être composé de 4 chiffres. Chaque restaurant peut avoir un PIN différent.</p>
+      </div>
+
+      <!-- Objectif CA -->
+      <div class="card" style="margin-bottom:18px;">
+        <div class="card-title">🎯 Objectif CA mensuel</div>
+        <div style="display:flex;align-items:center;gap:14px;max-width:400px;">
+          <div class="form-group" style="flex:1;margin-bottom:0;">
+            <label class="form-label">Objectif mensuel (€)</label>
+            <input type="number" class="form-ctrl" id="param-objectif" placeholder="ex: 20000" step="500">
+          </div>
+          <button class="btn btn-gold" style="margin-top:24px;" onclick="saveParamObjectif()">✓ Enregistrer</button>
+        </div>
+        <p style="font-size:12px;color:var(--text-muted);margin-top:12px;">Affiché sous forme de barre de progression sur le tableau de bord.</p>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="card" style="border-color:rgba(255,77,106,.2);">
+        <div class="card-title" style="color:var(--danger);">⚠️ Zone sensible</div>
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--rs);padding:18px;flex:1;min-width:220px;">
+            <div style="font-size:14px;font-weight:500;margin-bottom:6px;">Effacer les données démo</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Supprime toutes les données d'exemple et repart à zéro.</div>
+            <button class="btn btn-danger btn-sm" onclick="resetData()">🗑️ Effacer tout</button>
+          </div>
+          <div style="background:var(--bg-input);border:1px solid var(--border);border-radius:var(--rs);padding:18px;flex:1;min-width:220px;">
+            <div style="font-size:14px;font-weight:500;margin-bottom:6px;">Sauvegarde complète</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:12px;line-height:1.5;">Télécharge un fichier JSON avec toutes les données du restaurant actif.</div>
+            <button class="btn btn-outline btn-sm" onclick="backup()">↓ Sauvegarder JSON</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Infos application -->
+      <div style="margin-top:20px;text-align:center;font-size:12px;color:var(--text-muted);line-height:2;">
+        Khmer Compta v2 · Développé par <span style="color:var(--gold);">Nine Technologies</span><br>
+        07 80 19 30 96 · ninetechnologies@outlook.fr
+      </div>
+    </section>
+
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== DB ===== */
+let DB={recettes:[],depenses:[],caisse:[],recurrents:[],settings:{pin:'1234',objectifCA:0}};
+let pinVal='',chRev=null,chDep=null,chAnn=null;
+let currentRestau='cambodge'; // 'cambodge' ou 'bayon'
+
+const RESTAU_LABELS={cambodge:'Ô Petit Cambodge',bayon:'Ô Petit Bayon'};
+function storageKey(){return 'khmercompta_'+currentRestau;}
+function save(){localStorage.setItem(storageKey(),JSON.stringify(DB));}
+function load(){
+  const s=localStorage.getItem(storageKey());
+  if(s){try{const p=JSON.parse(s);DB={recettes:[],depenses:[],caisse:[],recurrents:[],settings:{pin:'1234',objectifCA:0},...p};DB.settings=DB.settings||{pin:'1234',objectifCA:0};}catch(e){seedDemo();}}
+  else{seedDemo();}
+}
+
+/* ===== DEMO DATA ===== */
+function seedDemo(){
+  const now=new Date();
+  DB.settings={pin:'1234',objectifCA:20000};
+  const canaux=['place','place','emporter'];
+  const tjours=['semaine','semaine','weekend'];
+  for(let i=5;i>=0;i--){
+    const y=now.getFullYear();let m=now.getMonth()-i;let yr=y;
+    while(m<0){m+=12;yr--;}
+    const mk=`${yr}-${String(m+1).padStart(2,'0')}`;
+    [[`${mk}-05`,'midi','place','semaine',1180,'carte',10,42],[`${mk}-05`,'soir','place','semaine',1450,'carte',10,58],
+     [`${mk}-12`,'midi','place','weekend',1520,'mixte',10,61],[`${mk}-12`,'soir','place','weekend',2100,'carte',10,88],
+     [`${mk}-19`,'midi','emporter','semaine',340,'especes',5.5,0],[`${mk}-22`,'soir','place','semaine',1300,'carte',10,52],
+    ].forEach(([d,s,c,tj,mt,mo,tv,cv])=>DB.recettes.push({id:uid(),date:d,service:s,canal:c,typeJour:tj,montant:mt,mode:mo,tva:tv,couverts:cv,note:''}));
+    [[`${mk}-01`,'loyer','Propriétaire SCI','LOYER-'+mk,1458.33,20,1750,'prelevement','mensuel','paye',''],
+     [`${mk}-03`,'matieres','Métro Cash','METRO-'+i,2100,5.5,2215.5,'virement','mensuel','paye',''],
+     [`${mk}-05`,'boissons','Grossiste Vins','VIN-'+i,480,20,576,'virement','ponctuel','paye',''],
+     [`${mk}-10`,'salaires','DSN Paie','DSN-'+mk,6250,0,6250,'virement','mensuel','paye',''],
+     [`${mk}-15`,'energie','EDF Pro','EDF-'+mk,312.5,20,375,'prelevement','mensuel','paye',''],
+     [`${mk}-28`,'compta','Cabinet Dupont','COMPTA-'+mk,150,20,180,'virement','mensuel','paye',''],
+    ].forEach(([d,c,f,fa,h,tv,ttc,mo,rec,st,no])=>DB.depenses.push({id:uid(),date:d,cat:c,fourn:f,facture:fa,ht:h,tva:tv,ttc:ttc,mode:mo,recurrence:rec,statut:st,note:no,photo:''}));
+  }
+  DB.recurrents=[
+    {id:uid(),label:'Loyer mensuel',cat:'loyer',fourn:'Propriétaire SCI',ht:1458.33,tva:20,ttc:1750,mode:'prelevement',freq:'mensuel',actif:true},
+    {id:uid(),label:'Salaires & charges',cat:'salaires',fourn:'DSN Paie',ht:6250,tva:0,ttc:6250,mode:'virement',freq:'mensuel',actif:true},
+    {id:uid(),label:'EDF Pro',cat:'energie',fourn:'EDF',ht:312.5,tva:20,ttc:375,mode:'prelevement',freq:'mensuel',actif:true},
+    {id:uid(),label:'Cabinet comptable',cat:'compta',fourn:'Cabinet Dupont',ht:150,tva:20,ttc:180,mode:'virement',freq:'mensuel',actif:true},
+    {id:uid(),label:'Assurance multi-risques',cat:'assurance',fourn:'AXA Pro',ht:83.33,tva:0,ttc:83.33,mode:'prelevement',freq:'mensuel',actif:true},
+  ];
+  const todayStr=today();
+  DB.caisse=[
+    {id:uid(),date:todayStr,fond:200,reel:198.5,note:'Petite erreur de monnaie'},
+  ];
+  save();
+}
+
+/* ===== UTILS ===== */
+function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
+function today(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function curM(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;}
+function mkey(date){return date?date.substr(0,7):'';}
+function prevM(m){const [y,mo]=m.split('-').map(Number);let pm=mo-1,py=y;if(pm<1){pm=12;py--;}return `${py}-${String(pm).padStart(2,'0')}`;}
+function fmt(v){return (v||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function fmtK(v){const a=Math.abs(v);const s=v<0?'-':'';return s+(a>=1000?(a/1000).toFixed(1).replace('.',',')+' k€':a.toFixed(0)+' €');}
+function fdate(s){const d=new Date(s+'T00:00:00');return d.toLocaleDateString('fr-FR',{day:'2-digit',month:'short'});}
+function mlabel(m){return{carte:'💳 CB',especes:'💵 Espèces',ticket:'🎫 Tickets',mixte:'📊 Mixte',virement:'🔄 Virement',prelevement:'🔄 Prélèv.',cheque:'📝 Chèque',uber:'🛵 Uber'}[m]||m;}
+function clabel(c){return{matieres:'Matières 1ères',boissons:'Boissons',loyer:'Loyer',salaires:'Salaires',energie:'Énergie',equipement:'Équipement',compta:'Comptable',marketing:'Marketing',assurance:'Assurance',pertes:'Pertes/casses',divers:'Divers'}[c]||c;}
+function slabel(s){return{paye:'✅ Payé',attente:'⏳ Attente',litige:'⚠️ Litige'}[s]||s;}
+function clabel2(c){return{place:'🍽️ Sur place',emporter:'📦 À emporter',livraison:'🛵 Livraison'}[c]||c;}
+function toast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.className='toast',3200);}
+
+/* ===== PIN ===== */
+function pinPress(n){
+  if(pinVal.length>=4)return;
+  pinVal+=n;
+  document.querySelectorAll('.pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinVal.length));
+  if(pinVal.length===4){
+    if(pinVal===DB.settings.pin){document.getElementById('login-screen').style.display='none';document.getElementById('app').classList.add('visible');initApp();}
+    else{document.getElementById('pin-err').textContent='Code incorrect';setTimeout(()=>{pinVal='';document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('filled'));document.getElementById('pin-err').textContent='';},800);}
+  }
+}
+function pinDelete(){pinVal=pinVal.slice(0,-1);document.querySelectorAll('.pin-dot').forEach((d,i)=>d.classList.toggle('filled',i<pinVal.length));}
+function pinClear(){pinVal='';document.querySelectorAll('.pin-dot').forEach(d=>d.classList.remove('filled'));}
+function logout(){document.getElementById('app').classList.remove('visible');document.getElementById('login-screen').style.display='flex';pinClear();}
+
+/* ===== RESTAURANT ===== */
+function selectRestau(r){
+  currentRestau=r;
+  load(); // charger les données du restau sélectionné
+  const labels={cambodge:'Ô Petit Cambodge · Gestion Financière',bayon:'Ô Petit Bayon · Gestion Financière'};
+  document.getElementById('login-restau-label').textContent=labels[r];
+  const actifStyle='flex:1;padding:10px;background:var(--gold);color:#05050D;font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;transition:all .15s;';
+  const inactifStyle='flex:1;padding:10px;background:var(--bg-input);color:var(--text-sec);font-family:\'DM Sans\',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .15s;';
+  document.getElementById('btn-cambodge').style.cssText=r==='cambodge'?actifStyle:inactifStyle;
+  document.getElementById('btn-bayon').style.cssText=r==='bayon'?actifStyle:inactifStyle;
+  pinClear();
+}
+function switchRestau(r){
+  if(r===currentRestau)return;
+  if(!confirm(`Basculer vers ${RESTAU_LABELS[r]} ? Les données du restaurant actuel seront sauvegardées.`))return;
+  save();
+  currentRestau=r;
+  load();
+  // reset charts
+  if(chRev){chRev.destroy();chRev=null;}
+  if(chDep){chDep.destroy();chDep=null;}
+  if(chAnn){chAnn.destroy();chAnn=null;}
+  initApp();
+  renderParametres();
+  toast(`Basculé vers ${RESTAU_LABELS[r]} !`,'success');
+}
+function updateSidebarRestau(){
+  const el=document.getElementById('sidebar-restau-tag');
+  if(el)el.textContent=RESTAU_LABELS[currentRestau];
+}
+
+/* ===== PIN ===== */
+function changePin(){
+  const actuel=document.getElementById('pin-actuel').value;
+  const nouveau=document.getElementById('pin-nouveau').value;
+  const confirm2=document.getElementById('pin-confirm').value;
+  const msg=document.getElementById('pin-msg');
+  if(actuel!==DB.settings.pin){msg.style.color='var(--danger)';msg.textContent='❌ Code actuel incorrect';return;}
+  if(!/^\d{4}$/.test(nouveau)){msg.style.color='var(--danger)';msg.textContent='❌ Le nouveau code doit être 4 chiffres';return;}
+  if(nouveau!==confirm2){msg.style.color='var(--danger)';msg.textContent='❌ Les codes ne correspondent pas';return;}
+  DB.settings.pin=nouveau;save();
+  document.getElementById('pin-actuel').value='';
+  document.getElementById('pin-nouveau').value='';
+  document.getElementById('pin-confirm').value='';
+  msg.style.color='var(--success)';msg.textContent='✅ Code PIN modifié avec succès !';
+  setTimeout(()=>msg.textContent='',3000);
+  toast('PIN modifié !','success');
+}
+function saveParamObjectif(){
+  const v=parseFloat(document.getElementById('param-objectif').value)||0;
+  DB.settings.objectifCA=v;save();refreshDash();toast('Objectif enregistré !','success');
+}
+function resetData(){
+  if(!confirm('Effacer TOUTES les données de '+RESTAU_LABELS[currentRestau]+' ? Cette action est irréversible.'))return;
+  DB={recettes:[],depenses:[],caisse:[],recurrents:[],settings:{pin:DB.settings.pin,objectifCA:0}};
+  save();
+  if(chRev){chRev.destroy();chRev=null;}
+  if(chDep){chDep.destroy();chDep=null;}
+  if(chAnn){chAnn.destroy();chAnn=null;}
+  initApp();toast('Données effacées.','error');
+}
+function renderParametres(){
+  // Activer/désactiver les cards restaurant
+  const isCambodge=currentRestau==='cambodge';
+  document.getElementById('card-cambodge').style.borderColor=isCambodge?'var(--gold)':'var(--border)';
+  document.getElementById('card-cambodge').style.opacity=isCambodge?'1':'0.6';
+  document.getElementById('badge-cambodge').style.display=isCambodge?'inline-block':'none';
+  document.getElementById('card-bayon').style.borderColor=!isCambodge?'var(--gold)':'var(--border)';
+  document.getElementById('card-bayon').style.opacity=!isCambodge?'1':'0.6';
+  document.getElementById('badge-bayon').style.display=!isCambodge?'inline-block':'none';
+  // Objectif CA
+  const objEl=document.getElementById('param-objectif');
+  if(objEl)objEl.value=DB.settings.objectifCA||'';
+  // Reset champs PIN
+  ['pin-actuel','pin-nouveau','pin-confirm'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('pin-msg').textContent='';
+}
+
+/* ===== NAV ===== */
+function go(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{if(n.getAttribute('onclick')===`go('${page}')`)n.classList.add('active');});
+  if(page==='recettes')renderRec();
+  if(page==='depenses')renderDep();
+  if(page==='tva')renderTVA();
+  if(page==='rapports')renderRap();
+  if(page==='caisse')renderCaisse();
+  if(page==='recurrents')renderRecurrents();
+  if(page==='parametres')renderParametres();
+}
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+/* ===== INIT ===== */
+function initApp(){
+  const m=curM();
+  ['r-month','d-month','ex-bilan','ex-rec','ex-fec'].forEach(id=>{const el=document.getElementById(id);if(el)el.value=m;});
+  const sel=document.getElementById('tva-period');
+  sel.innerHTML='';
+  const now=new Date();
+  for(let i=0;i<12;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;const o=document.createElement('option');o.value=k;o.textContent=d.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});if(i===0)o.selected=true;sel.appendChild(o);}
+  document.getElementById('rec-date').value=today();
+  document.getElementById('dep-date').value=today();
+  const objEl=document.getElementById('objectif-ca');
+  if(DB.settings.objectifCA)objEl.value=DB.settings.objectifCA;
+  initCharts();
+  refreshDash();
+  updateSidebarRestau();
+}
+function saveObjectif(){DB.settings.objectifCA=parseFloat(document.getElementById('objectif-ca').value)||0;save();refreshDash();}
+
+/* ===== MODAL HELPERS ===== */
+function setAmt(v){document.getElementById('rec-montant').value=v;}
+function autoTVACanal(){
+  const c=document.getElementById('rec-canal').value;
+  const tv=document.getElementById('rec-tva');
+  if(c==='place')tv.value='10';
+  else if(c==='emporter'||c==='livraison')tv.value='5.5';
+}
+function calcTTC(){const h=parseFloat(document.getElementById('dep-ht').value)||0,t=parseFloat(document.getElementById('dep-tva').value)||0;document.getElementById('dep-ttc').value=(h*(1+t/100)).toFixed(2);}
+function calcHT(){const ttc=parseFloat(document.getElementById('dep-ttc').value)||0,t=parseFloat(document.getElementById('dep-tva').value)||0;document.getElementById('dep-ht').value=(ttc/(1+t/100)).toFixed(2);}
+function calcRchTTC(){const h=parseFloat(document.getElementById('rch-ht').value)||0,t=parseFloat(document.getElementById('rch-tva').value)||0;document.getElementById('rch-ttc').value=(h*(1+t/100)).toFixed(2);}
+function calcEcart(){
+  const fond=parseFloat(document.getElementById('caisse-fond').value)||0;
+  const reel=parseFloat(document.getElementById('caisse-reel').value)||0;
+  if(fond||reel){
+    const ecart=reel-fond;
+    const el=document.getElementById('ecart-display');
+    el.style.display='block';
+    document.getElementById('ecart-val').style.color=ecart===0?'var(--success)':ecart>0?'var(--info)':'var(--danger)';
+    document.getElementById('ecart-val').textContent=(ecart>0?'+':'')+ecart.toFixed(2)+' €';
+  }
+}
+
+/* ===== PHOTO ===== */
+function previewPhoto(input){
+  if(input.files&&input.files[0]){
+    const r=new FileReader();
+    r.onload=e=>{const img=document.getElementById('dep-photo-preview');img.src=e.target.result;img.style.display='block';};
+    r.readAsDataURL(input.files[0]);
+  }
+}
+function viewPhoto(src){document.getElementById('photo-full').src=src;openModal('modal-photo');}
+
+/* ===== RECETTES ===== */
+function saveRecette(){
+  const editId=document.getElementById('rec-edit-id').textContent;
+  const date=document.getElementById('rec-date').value;
+  const montant=parseFloat(document.getElementById('rec-montant').value);
+  if(!date||!montant||montant<=0){toast('Renseignez date et montant.','error');return;}
+  const obj={
+    id:editId||uid(),date,
+    service:document.getElementById('rec-service').value,
+    canal:document.getElementById('rec-canal').value,
+    typeJour:document.getElementById('rec-typejour').value,
+    montant,
+    mode:document.getElementById('rec-mode').value,
+    tva:parseFloat(document.getElementById('rec-tva').value),
+    couverts:parseInt(document.getElementById('rec-couverts').value)||0,
+    note:document.getElementById('rec-note').value
+  };
+  if(editId){const idx=DB.recettes.findIndex(r=>r.id===editId);if(idx>=0)DB.recettes[idx]=obj;}
+  else DB.recettes.push(obj);
+  save();closeModal('modal-rec');clearRecForm();
+  toast(editId?'Recette modifiée !':'Recette enregistrée !','success');refreshDash();
+  if(document.getElementById('page-recettes').classList.contains('active'))renderRec();
+}
+function clearRecForm(){
+  ['rec-montant','rec-couverts','rec-note'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('rec-date').value=today();
+  document.getElementById('rec-edit-id').textContent='';
+  document.getElementById('modal-rec-title').textContent='Nouvelle recette';
+}
+function editRec(id){
+  const r=DB.recettes.find(x=>x.id===id);if(!r)return;
+  document.getElementById('rec-edit-id').textContent=id;
+  document.getElementById('modal-rec-title').textContent='Modifier la recette';
+  document.getElementById('rec-date').value=r.date;
+  document.getElementById('rec-service').value=r.service;
+  document.getElementById('rec-canal').value=r.canal||'place';
+  document.getElementById('rec-typejour').value=r.typeJour||'semaine';
+  document.getElementById('rec-montant').value=r.montant;
+  document.getElementById('rec-mode').value=r.mode;
+  document.getElementById('rec-tva').value=r.tva;
+  document.getElementById('rec-couverts').value=r.couverts||0;
+  document.getElementById('rec-note').value=r.note||'';
+  openModal('modal-rec');
+}
+function delRec(id){if(!confirm('Supprimer cette recette ?'))return;DB.recettes=DB.recettes.filter(r=>r.id!==id);save();renderRec();refreshDash();toast('Supprimée.','error');}
+function renderRec(){
+  const m=document.getElementById('r-month').value||curM();
+  const pm=prevM(m);
+  let rows=DB.recettes.filter(r=>mkey(r.date)===m);
+  const sv=document.getElementById('r-service').value;
+  const cv=document.getElementById('r-canal').value;
+  const tv=document.getElementById('r-typejour').value;
+  if(sv)rows=rows.filter(r=>r.service===sv);
+  if(cv)rows=rows.filter(r=>(r.canal||'place')===cv);
+  if(tv)rows=rows.filter(r=>(r.typeJour||'semaine')===tv);
+  rows.sort((a,b)=>b.date.localeCompare(a.date));
+  const tot=rows.reduce((s,r)=>s+r.montant,0);
+  const prevRows=DB.recettes.filter(r=>mkey(r.date)===pm);
+  const prevTot=prevRows.reduce((s,r)=>s+r.montant,0);
+  const diff=prevTot>0?((tot-prevTot)/prevTot*100):null;
+  const cv2=rows.reduce((s,r)=>s+(r.couverts||0),0);
+  document.getElementById('r-total').textContent=fmt(tot);
+  document.getElementById('r-nb').textContent=rows.length;
+  document.getElementById('r-moy').textContent=cv2>0?fmt(tot/cv2):'—';
+  const n1El=document.getElementById('r-n1');
+  if(diff!==null){n1El.innerHTML=`<span class="kpi-trend ${diff>=0?'trend-up':'trend-dn'}">${diff>=0?'↑':'↓'} ${Math.abs(diff).toFixed(1)}%</span>`;n1El.style.fontSize='14px';}
+  else n1El.textContent='—';
+  document.getElementById('r-count').textContent=rows.length+' ligne(s)';
+  const tb=document.getElementById('rec-tbody');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="11" style="text-align:center;padding:36px;color:var(--text-muted);">Aucune recette pour cette période</td></tr>';return;}
+  const canalBadge={place:'b-place',emporter:'b-emporter',livraison:'b-livraison'};
+  const jourBadge={semaine:'',weekend:'b-weekend',ferie:'b-ferie'};
+  tb.innerHTML=rows.map(r=>{
+    const ht=r.montant/(1+r.tva/100);const tvaA=r.montant-ht;
+    const cb=canalBadge[r.canal||'place']||'b-place';
+    const jb=jourBadge[r.typeJour||'semaine']||'';
+    return `<tr>
+      <td style="padding-left:18px;">${fdate(r.date)}</td>
+      <td><span class="badge b-${r.service}">${r.service==='midi'?'🌞 Midi':'🌙 Soir'}</span></td>
+      <td><span class="badge ${cb}">${clabel2(r.canal||'place')}</span></td>
+      <td>${jb?`<span class="badge ${jb}">${r.typeJour==='weekend'?'Weekend':'⭐ Férié'}</span>`:'-'}</td>
+      <td style="color:var(--text-muted);">${r.couverts||0}</td>
+      <td style="font-size:12px;">${mlabel(r.mode)}</td>
+      <td style="color:var(--text-muted);">${r.tva}%</td>
+      <td class="ap">${fmt(r.montant)}</td>
+      <td style="color:var(--gold);font-size:12px;">${fmt(tvaA)}</td>
+      <td style="color:var(--text-muted);font-size:12px;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.note||'—'}</td>
+      <td style="display:flex;gap:4px;"><button class="btn btn-sm btn-outline" onclick="editRec('${r.id}')" style="padding:5px 8px;">✏️</button><button class="btn btn-sm btn-danger" onclick="delRec('${r.id}')">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ===== DÉPENSES ===== */
+function saveDepense(){
+  const editId=document.getElementById('dep-edit-id').textContent;
+  const date=document.getElementById('dep-date').value;
+  const ht=parseFloat(document.getElementById('dep-ht').value);
+  if(!date||!ht||ht<=0){toast('Renseignez date et montant HT.','error');return;}
+  const tva=parseFloat(document.getElementById('dep-tva').value);
+  const ttc=parseFloat(document.getElementById('dep-ttc').value)||ht*(1+tva/100);
+  const photo=document.getElementById('dep-photo-preview').src.startsWith('data:')?document.getElementById('dep-photo-preview').src:'';
+  const obj={
+    id:editId||uid(),date,
+    cat:document.getElementById('dep-cat').value,
+    fourn:document.getElementById('dep-fourn').value,
+    ht,tva,ttc,
+    mode:document.getElementById('dep-mode').value,
+    facture:document.getElementById('dep-facture').value,
+    note:document.getElementById('dep-note').value,
+    recurrence:document.getElementById('dep-recurrence').value,
+    statut:document.getElementById('dep-statut').value,
+    photo
+  };
+  if(editId){const idx=DB.depenses.findIndex(d=>d.id===editId);if(idx>=0)DB.depenses[idx]=obj;}
+  else DB.depenses.push(obj);
+  save();closeModal('modal-dep');clearDepForm();
+  toast(editId?'Dépense modifiée !':'Dépense enregistrée !','success');refreshDash();
+  if(document.getElementById('page-depenses').classList.contains('active'))renderDep();
+}
+function clearDepForm(){
+  ['dep-ht','dep-ttc','dep-fourn','dep-facture','dep-note'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('dep-date').value=today();
+  document.getElementById('dep-recurrence').value='ponctuel';
+  document.getElementById('dep-statut').value='paye';
+  document.getElementById('dep-edit-id').textContent='';
+  document.getElementById('modal-dep-title').textContent='Nouvelle dépense';
+  document.getElementById('dep-photo-preview').style.display='none';
+  document.getElementById('dep-photo-preview').src='';
+}
+function editDep(id){
+  const d=DB.depenses.find(x=>x.id===id);if(!d)return;
+  document.getElementById('dep-edit-id').textContent=id;
+  document.getElementById('modal-dep-title').textContent='Modifier la dépense';
+  document.getElementById('dep-date').value=d.date;
+  document.getElementById('dep-cat').value=d.cat;
+  document.getElementById('dep-fourn').value=d.fourn||'';
+  document.getElementById('dep-ht').value=d.ht;
+  document.getElementById('dep-tva').value=d.tva;
+  document.getElementById('dep-ttc').value=d.ttc;
+  document.getElementById('dep-mode').value=d.mode||'virement';
+  document.getElementById('dep-facture').value=d.facture||'';
+  document.getElementById('dep-note').value=d.note||'';
+  document.getElementById('dep-recurrence').value=d.recurrence||'ponctuel';
+  document.getElementById('dep-statut').value=d.statut||'paye';
+  if(d.photo){const img=document.getElementById('dep-photo-preview');img.src=d.photo;img.style.display='block';}
+  openModal('modal-dep');
+}
+function delDep(id){if(!confirm('Supprimer cette dépense ?'))return;DB.depenses=DB.depenses.filter(d=>d.id!==id);save();renderDep();refreshDash();toast('Supprimée.','error');}
+function renderDep(){
+  const m=document.getElementById('d-month').value||curM();
+  const cat=document.getElementById('d-cat').value;
+  const statut=document.getElementById('d-statut').value;
+  const rec=document.getElementById('d-recurrence').value;
+  let rows=DB.depenses.filter(d=>mkey(d.date)===m);
+  if(cat)rows=rows.filter(d=>d.cat===cat);
+  if(statut)rows=rows.filter(d=>(d.statut||'paye')===statut);
+  if(rec)rows=rows.filter(d=>(d.recurrence||'ponctuel')===rec);
+  rows.sort((a,b)=>b.date.localeCompare(a.date));
+  const tht=rows.reduce((s,d)=>s+d.ht,0);
+  const tttc=rows.reduce((s,d)=>s+d.ttc,0);
+  const tded=rows.reduce((s,d)=>s+(d.ht*d.tva/100),0);
+  const tattente=rows.filter(d=>(d.statut||'paye')==='attente').reduce((s,d)=>s+d.ttc,0);
+  document.getElementById('d-ht').textContent=fmt(tht);
+  document.getElementById('d-ttc').textContent=fmt(tttc);
+  document.getElementById('d-tva-ded').textContent=fmt(tded);
+  document.getElementById('d-attente').textContent=fmt(tattente);
+  document.getElementById('d-count').textContent=rows.length+' entrée(s)';
+  const tb=document.getElementById('dep-tbody');
+  if(!rows.length){tb.innerHTML='<tr><td colspan="11" style="text-align:center;padding:36px;color:var(--text-muted);">Aucune dépense pour cette période</td></tr>';return;}
+  const recBadge={ponctuel:'',mensuel:'<span class="badge" style="background:rgba(90,179,255,.1);color:var(--info);">🔄 Mensuel</span>',annuel:'<span class="badge" style="background:rgba(201,168,76,.1);color:var(--gold);">📅 Annuel</span>'};
+  tb.innerHTML=rows.map(d=>`<tr>
+    <td style="padding-left:18px;">${fdate(d.date)}</td>
+    <td>${d.fourn||'—'}</td>
+    <td style="font-size:12px;color:var(--text-muted);">${clabel(d.cat)}</td>
+    <td>${recBadge[d.recurrence||'ponctuel']||''}</td>
+    <td><span class="badge b-${d.statut||'paye'}">${slabel(d.statut||'paye')}</span></td>
+    <td style="font-size:12px;color:var(--text-muted);">${d.facture||'—'}</td>
+    <td class="an">${fmt(d.ht)}</td>
+    <td style="color:var(--text-muted);">${d.tva}%</td>
+    <td>${fmt(d.ttc)}</td>
+    <td>${d.photo?`<span style="cursor:pointer;font-size:16px;" onclick="viewPhoto('${d.photo}')">📷</span>`:'—'}</td>
+    <td style="display:flex;gap:4px;"><button class="btn btn-sm btn-outline" onclick="editDep('${d.id}')" style="padding:5px 8px;">✏️</button><button class="btn btn-sm btn-danger" onclick="delDep('${d.id}')">✕</button></td>
+  </tr>`).join('');
+}
+
+/* ===== CAISSE ===== */
+function openCaisse(){
+  document.getElementById('caisse-date').value=today();
+  document.getElementById('caisse-fond').value='200';
+  document.getElementById('caisse-reel').value='';
+  document.getElementById('caisse-note').value='';
+  document.getElementById('ecart-display').style.display='none';
+  openModal('modal-caisse');
+}
+function saveCaisse(){
+  const date=document.getElementById('caisse-date').value;
+  const fond=parseFloat(document.getElementById('caisse-fond').value)||0;
+  const reel=parseFloat(document.getElementById('caisse-reel').value)||0;
+  if(!date){toast('Renseignez la date.','error');return;}
+  DB.caisse.push({id:uid(),date,fond,reel,note:document.getElementById('caisse-note').value});
+  save();closeModal('modal-caisse');renderCaisse();toast('Caisse clôturée !','success');refreshDash();
+}
+function delCaisse(id){if(!confirm('Supprimer cette clôture ?'))return;DB.caisse=DB.caisse.filter(c=>c.id!==id);save();renderCaisse();}
+function renderCaisse(){
+  const m=curM();
+  const rows=DB.caisse.filter(c=>mkey(c.date)===m).sort((a,b)=>b.date.localeCompare(a.date));
+  const all=DB.caisse.sort((a,b)=>b.date.localeCompare(a.date));
+  document.getElementById('cs-nb').textContent=rows.length;
+  const totalEcart=rows.reduce((s,c)=>s+(c.reel-c.fond),0);
+  document.getElementById('cs-ecart').innerHTML=`<span style="color:${totalEcart===0?'var(--success)':totalEcart>0?'var(--info)':'var(--danger)'}">${totalEcart>=0?'+':''}${totalEcart.toFixed(2)} €</span>`;
+  const last=all[0];
+  if(last){const e=last.reel-last.fond;document.getElementById('cs-last').innerHTML=`<span style="color:${e===0?'var(--success)':e>0?'var(--info)':'var(--danger)'}">${e>=0?'+':''}${e.toFixed(2)} €</span>`;}
+  else document.getElementById('cs-last').textContent='—';
+  const tb=document.getElementById('caisse-tbody');
+  if(!all.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;padding:36px;color:var(--text-muted);">Aucune clôture de caisse</td></tr>';return;}
+  tb.innerHTML=all.slice(0,30).map(c=>{const e=c.reel-c.fond;return `<tr>
+    <td style="padding-left:18px;">${fdate(c.date)}</td>
+    <td>${fmt(c.fond)}</td>
+    <td>${fmt(c.reel)}</td>
+    <td style="color:${e===0?'var(--success)':e>0?'var(--info)':'var(--danger)'};font-weight:500;">${e>=0?'+':''}${e.toFixed(2)} €</td>
+    <td style="color:var(--text-muted);font-size:12px;">${c.note||'—'}</td>
+    <td><button class="btn btn-sm btn-danger" onclick="delCaisse('${c.id}')">✕</button></td>
+  </tr>`;}).join('');
+}
+
+/* ===== RÉCURRENTS ===== */
+function saveRecCharge(){
+  const label=document.getElementById('rch-label').value;
+  const ht=parseFloat(document.getElementById('rch-ht').value);
+  if(!label||!ht){toast('Renseignez libellé et montant.','error');return;}
+  const tva=parseFloat(document.getElementById('rch-tva').value);
+  const ttc=parseFloat(document.getElementById('rch-ttc').value)||ht*(1+tva/100);
+  DB.recurrents.push({id:uid(),label,cat:document.getElementById('rch-cat').value,fourn:document.getElementById('rch-fourn').value,ht,tva,ttc,mode:document.getElementById('rch-mode').value,freq:document.getElementById('rch-freq').value,actif:true});
+  save();closeModal('modal-rec-charge');renderRecurrents();toast('Charge ajoutée !','success');
+}
+function toggleRch(id){const r=DB.recurrents.find(x=>x.id===id);if(r){r.actif=!r.actif;save();renderRecurrents();}}
+function delRch(id){if(!confirm('Supprimer cette charge récurrente ?'))return;DB.recurrents=DB.recurrents.filter(r=>r.id!==id);save();renderRecurrents();}
+function injecterRecurrents(){
+  const m=curM();
+  const actifs=DB.recurrents.filter(r=>r.actif);
+  if(!actifs.length){toast('Aucune charge active.','error');return;}
+  let injectees=0;
+  actifs.forEach(r=>{
+    const deja=DB.depenses.some(d=>d.source_rch===r.id&&mkey(d.date)===m);
+    if(!deja){
+      const [y,mo]=m.split('-');
+      DB.depenses.push({id:uid(),date:`${y}-${mo}-01`,cat:r.cat,fourn:r.fourn,ht:r.ht,tva:r.tva,ttc:r.ttc,mode:r.mode,facture:'',note:`[Auto] ${r.label}`,recurrence:'mensuel',statut:'attente',photo:'',source_rch:r.id});
+      injectees++;
+    }
+  });
+  save();
+  const alEl=document.getElementById('alert-injection');
+  if(injectees>0){alEl.innerHTML=`<div class="alert alert-success">✅ ${injectees} charge(s) injectée(s) dans les dépenses de ${m} avec statut "En attente".</div>`;toast(`${injectees} charge(s) injectée(s) !`,'success');refreshDash();}
+  else{alEl.innerHTML=`<div class="alert alert-info">ℹ️ Toutes les charges actives ont déjà été injectées pour ${m}.</div>`;toast('Déjà injectées ce mois.','');}
+}
+function renderRecurrents(){
+  const actifs=DB.recurrents.filter(r=>r.actif);
+  const tot=actifs.reduce((s,r)=>s+r.ttc,0);
+  const tva=actifs.reduce((s,r)=>s+(r.ht*r.tva/100),0);
+  document.getElementById('rch-nb').textContent=actifs.length;
+  document.getElementById('rch-total').textContent=fmt(tot);
+  document.getElementById('rch-tva').textContent=fmt(tva);
+  const el=document.getElementById('rch-list');
+  if(!DB.recurrents.length){el.innerHTML='<div class="card" style="text-align:center;padding:40px;color:var(--text-muted);">Aucune charge récurrente. Ajoutez vos charges fixes (loyer, salaires, abonnements).</div>';return;}
+  el.innerHTML=DB.recurrents.map(r=>`
+    <div class="rec-item ${r.actif?'':'inactive'}">
+      <div style="display:flex;align-items:center;gap:14px;flex:1;">
+        <div class="toggle ${r.actif?'on':''}" onclick="toggleRch('${r.id}')"></div>
+        <div>
+          <div style="font-weight:500;color:var(--text);font-size:14px;">${r.label}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${clabel(r.cat)} · ${r.fourn||'—'} · ${r.freq==='mensuel'?'Mensuelle':'Annuelle'}</div>
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-family:'Playfair Display',serif;font-size:18px;color:var(--danger);">${fmt(r.ttc)}</div>
+        <div style="font-size:11px;color:var(--text-muted);">HT ${fmt(r.ht)} · TVA ${r.tva}%</div>
+      </div>
+      <button class="btn btn-sm btn-danger" onclick="delRch('${r.id}')">✕</button>
+    </div>`).join('');
+}
+
+/* ===== TVA ===== */
+function renderTVA(){
+  const period=document.getElementById('tva-period').value||curM();
+  const recs=DB.recettes.filter(r=>mkey(r.date)===period);
+  const deps=DB.depenses.filter(d=>mkey(d.date)===period);
+  const cByT={};
+  recs.forEach(r=>{if(!cByT[r.tva])cByT[r.tva]={base:0,tva:0};const ht=r.montant/(1+r.tva/100);cByT[r.tva].base+=ht;cByT[r.tva].tva+=r.montant-ht;});
+  const dByT={};
+  deps.forEach(d=>{if(!dByT[d.tva])dByT[d.tva]={base:0,tva:0};dByT[d.tva].base+=d.ht;dByT[d.tva].tva+=d.ht*d.tva/100;});
+  const totC=Object.values(cByT).reduce((s,v)=>s+v.tva,0);
+  const totD=Object.values(dByT).reduce((s,v)=>s+v.tva,0);
+  const solde=totC-totD;
+  const caTTC=recs.reduce((s,r)=>s+r.montant,0);
+  const caHT=recs.reduce((s,r)=>s+r.montant/(1+r.tva/100),0);
+  document.getElementById('tva-summary').innerHTML=`
+    <div class="tva-box"><div class="tva-lbl">TVA collectée</div><div class="tva-amt">${fmt(totC)}</div><div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Sur ${fmt(caTTC)} TTC</div></div>
+    <div class="tva-box"><div class="tva-lbl">TVA déductible</div><div class="tva-amt" style="color:var(--success);">${fmt(totD)}</div><div style="font-size:11px;color:var(--text-muted);margin-top:6px;">Sur ${fmt(deps.reduce((s,d)=>s+d.ht,0))} HT</div></div>
+    <div class="tva-box solde ${solde<0?'credit':''}"><div class="tva-lbl">${solde>=0?'TVA à reverser':'Crédit de TVA'}</div><div class="tva-amt">${fmt(Math.abs(solde))}</div><div style="font-size:11px;color:var(--text-muted);margin-top:6px;">${solde>=0?'↗ À régler avant le 15':'↙ Reportable'}</div></div>
+  `;
+  document.getElementById('tva-coll').innerHTML=Object.entries(cByT).map(([t,v])=>`<tr><td style="padding-left:12px;">${t}%</td><td>${fmt(v.base)}</td><td class="ap">${fmt(v.tva)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text-muted);">—</td></tr>';
+  document.getElementById('tva-ded').innerHTML=Object.entries(dByT).filter(([t])=>parseFloat(t)>0).map(([t,v])=>`<tr><td style="padding-left:12px;">${t}%</td><td>${fmt(v.base)}</td><td class="ap">${fmt(v.tva)}</td></tr>`).join('')||'<tr><td colspan="3" style="text-align:center;padding:20px;color:var(--text-muted);">—</td></tr>';
+  document.getElementById('tva-recap').innerHTML=`
+    <div>Période : <strong style="color:var(--text);">${period}</strong></div>
+    <div>CA TTC (ligne 01) : <strong style="color:var(--text);">${fmt(caTTC)}</strong></div>
+    <div>CA HT total : <strong style="color:var(--text);">${fmt(caHT)}</strong></div>
+    <div>TVA collectée (ligne 08) : <strong style="color:var(--gold);">${fmt(totC)}</strong></div>
+    <div>TVA déductible achats (ligne 20) : <strong style="color:var(--success);">${fmt(totD)}</strong></div>
+    <div style="border-top:1px solid var(--border);padding-top:10px;margin-top:4px;">${solde>=0?'<strong>TVA à payer (ligne 28) : <span style=\'color:var(--danger)\'>' + fmt(solde) + '</span></strong>':'<strong>Crédit de TVA : <span style=\'color:var(--success)\'>' + fmt(Math.abs(solde)) + '</span></strong>'}</div>
+  `;
+}
+
+/* ===== DASHBOARD ===== */
+function refreshDash(){
+  const t=today(),m=curM(),pm=prevM(m);
+  const jr=DB.recettes.filter(r=>r.date===t);
+  const jca=jr.reduce((s,r)=>s+r.montant,0);
+  document.getElementById('k-jour').textContent=fmt(jca);
+  document.getElementById('k-jour-s').textContent=jr.length?jr.length+' service(s)':'Aucune recette';
+  const mr=DB.recettes.filter(r=>mkey(r.date)===m);
+  const mca=mr.reduce((s,r)=>s+r.montant,0);
+  const cv=mr.reduce((s,r)=>s+(r.couverts||0),0);
+  document.getElementById('k-mois').textContent=fmtK(mca);
+  document.getElementById('k-mois-s').textContent=mr.length+' services · '+cv+' couverts';
+  const obj=DB.settings.objectifCA||0;
+  if(obj>0){
+    const pct=Math.min(100,mca/obj*100);
+    document.getElementById('k-mois-prog').style.display='block';
+    document.getElementById('prog-ca').style.width=pct+'%';
+    document.getElementById('prog-ca').style.background=pct>=100?'var(--success)':pct>=70?'var(--gold)':'var(--info)';
+    document.getElementById('prog-ca-label').textContent=pct.toFixed(0)+'% de l\'objectif '+fmtK(obj);
+  } else document.getElementById('k-mois-prog').style.display='none';
+  const md=DB.depenses.filter(d=>mkey(d.date)===m);
+  const mdep=md.reduce((s,d)=>s+d.ttc,0);
+  document.getElementById('k-dep').textContent=fmtK(mdep);
+  document.getElementById('k-dep-s').textContent=md.length+' opération(s)';
+  const marge=mca-mdep,mp=mca>0?(marge/mca*100):0;
+  document.getElementById('k-marge').textContent=fmtK(marge);
+  document.getElementById('k-marge-s').innerHTML=`<span class="kpi-trend ${marge>=0?'trend-up':'trend-dn'}">${marge>=0?'↑':'↓'} ${mp.toFixed(1)}%</span>`;
+  const ticket=cv>0?mca/cv:0;
+  document.getElementById('k-ticket').textContent=ticket>0?fmt(ticket):'—';
+  document.getElementById('k-ticket-s').textContent=cv>0?cv+' couverts total':'pas de couverts saisis';
+  // Alerte TVA
+  const now=new Date();
+  const alerts=[];
+  if(now.getDate()>=10&&now.getDate()<=15){alerts.push(`<div class="alert alert-warning">⚠️ Déclaration TVA à effectuer avant le 15 du mois. <a onclick="go('tva')" style="cursor:pointer;text-decoration:underline;color:inherit;">Voir le suivi TVA →</a></div>`);}
+  const attente=DB.depenses.filter(d=>mkey(d.date)===m&&(d.statut||'paye')==='attente');
+  if(attente.length){alerts.push(`<div class="alert alert-warning">⏳ ${attente.length} facture(s) en attente de règlement ce mois (${fmt(attente.reduce((s,d)=>s+d.ttc,0))}). <a onclick="go('depenses')" style="cursor:pointer;text-decoration:underline;color:inherit;">Voir →</a></div>`);}
+  document.getElementById('dash-alerts').innerHTML=alerts.join('');
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const all=[...DB.recettes.map(r=>({...r,type:'rec',amt:r.montant})),...DB.depenses.map(d=>({...d,type:'dep',amt:d.ttc}))].sort((a,b)=>b.date.localeCompare(a.date)).slice(0,8);
+  const tb=document.getElementById('recent-ops');
+  if(!all.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;padding:30px;color:var(--text-muted);">Aucune opération</td></tr>';return;}
+  tb.innerHTML=all.map(op=>`<tr>
+    <td>${fdate(op.date)}</td>
+    <td><span class="badge b-${op.type==='rec'?'rec':'dep'}">${op.type==='rec'?'↑ Recette':'↓ Dépense'}</span></td>
+    <td style="color:var(--text-muted);font-size:12px;">${op.type==='rec'?(op.service+(op.note?' · '+op.note:'')):(op.fourn||clabel(op.cat))}</td>
+    <td style="font-size:12px;color:var(--text-muted);">${op.type==='rec'?mlabel(op.mode):(op.mode||'—')}</td>
+    <td class="${op.type==='rec'?'ap':'an'}">${fmt(op.amt)}</td>
+  </tr>`).join('');
+  updCharts();
+}
+
+/* ===== CHARTS ===== */
+function initCharts(){
+  const base={responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0D0D1C',borderColor:'#C9A84C',borderWidth:1,titleColor:'#EDE8DF',bodyColor:'#9898B8'}},scales:{x:{grid:{color:'rgba(201,168,76,0.05)'},ticks:{color:'#686888',font:{family:"'DM Sans'"}}},y:{grid:{color:'rgba(201,168,76,0.05)'},ticks:{color:'#686888',font:{family:"'DM Sans'"},callback:v=>(v>=1000?Math.round(v/1000)+'k':Math.round(v))+' €'}}}};
+  chRev=new Chart(document.getElementById('ch-rev').getContext('2d'),{type:'bar',data:{labels:[],datasets:[{data:[],backgroundColor:'rgba(201,168,76,.25)',borderColor:'#C9A84C',borderWidth:1.5,borderRadius:6}]},options:base});
+  chDep=new Chart(document.getElementById('ch-dep').getContext('2d'),{type:'doughnut',data:{labels:[],datasets:[{data:[],backgroundColor:['#C9A84C','#1B9978','#378ADD','#E85D6F','#F5A623','#8B5CF6','#06B6D4'],borderWidth:0,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{backgroundColor:'#0D0D1C',borderColor:'#C9A84C',borderWidth:1,titleColor:'#EDE8DF',bodyColor:'#9898B8'}}}});
+  const lineBase={...base,plugins:{...base.plugins,legend:{display:true,labels:{color:'#9898B8',font:{family:"'DM Sans'"}}}}};
+  chAnn=new Chart(document.getElementById('ch-annual').getContext('2d'),{type:'line',data:{labels:[],datasets:[{label:'CA TTC',data:[],borderColor:'#C9A84C',backgroundColor:'rgba(201,168,76,.08)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#C9A84C'},{label:'Dépenses',data:[],borderColor:'#E85D6F',backgroundColor:'rgba(255,77,106,.06)',fill:true,tension:.4,pointRadius:4,pointBackgroundColor:'#E85D6F'}]},options:lineBase});
+}
+function updCharts(){
+  if(!chRev)return;
+  const now=new Date(),months=[],labels=[];
+  for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);labels.push(d.toLocaleDateString('fr-FR',{month:'short',year:'2-digit'}));}
+  const f=(document.getElementById('ch-filter')||{}).value||'ca';
+  const data=months.map(m=>{const ca=DB.recettes.filter(r=>mkey(r.date)===m).reduce((s,r)=>s+r.montant,0);const dep=DB.depenses.filter(d=>mkey(d.date)===m).reduce((s,d)=>s+d.ttc,0);return f==='ca'?ca:f==='dep'?dep:ca-dep;});
+  const col=f==='ca'?'#C9A84C':f==='dep'?'#E85D6F':'#1B9978';
+  chRev.data.labels=labels;chRev.data.datasets[0].data=data;chRev.data.datasets[0].backgroundColor=col+'33';chRev.data.datasets[0].borderColor=col;chRev.update();
+  const cm=curM();const deps=DB.depenses.filter(d=>mkey(d.date)===cm);const byCat={};deps.forEach(d=>{byCat[clabel(d.cat)]=(byCat[clabel(d.cat)]||0)+d.ttc;});
+  chDep.data.labels=Object.keys(byCat);chDep.data.datasets[0].data=Object.values(byCat);chDep.update();
+  const colors=['#C9A84C','#1B9978','#378ADD','#E85D6F','#F5A623','#8B5CF6','#06B6D4'];
+  const tot=Object.values(byCat).reduce((s,v)=>s+v,0);
+  document.getElementById('dep-legend').innerHTML=Object.entries(byCat).slice(0,5).map(([l,v],i)=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;"><div style="width:7px;height:7px;border-radius:2px;background:${colors[i%7]};flex-shrink:0;"></div><span style="color:var(--text-muted);flex:1;font-size:11px;">${l}</span><span style="color:var(--text);font-size:11px;">${tot>0?Math.round(v/tot*100):0}%</span></div>`).join('');
+}
+
+/* ===== RAPPORTS ===== */
+function renderRap(){
+  const y=new Date().getFullYear();
+  const yr=DB.recettes.filter(r=>r.date.startsWith(y));
+  const yd=DB.depenses.filter(d=>d.date.startsWith(y));
+  const yca=yr.reduce((s,r)=>s+r.montant,0),ydep=yd.reduce((s,d)=>s+d.ttc,0);
+  const cv=yr.reduce((s,r)=>s+(r.couverts||0),0);
+  document.getElementById('annual-kpi').innerHTML=`
+    <div class="kpi-grid kpi-grid-4">
+      <div class="kpi-card"><div class="kpi-label">CA ${y}</div><div class="kpi-value" style="font-size:20px;">${fmtK(yca)}</div></div>
+      <div class="kpi-card kpi-danger"><div class="kpi-label">Dépenses ${y}</div><div class="kpi-value" style="font-size:20px;color:var(--danger);">${fmtK(ydep)}</div></div>
+      <div class="kpi-card kpi-success"><div class="kpi-label">Marge ${y}</div><div class="kpi-value" style="font-size:20px;color:${yca-ydep>=0?'var(--success)':'var(--danger)'};">${fmtK(yca-ydep)}</div></div>
+      <div class="kpi-card"><div class="kpi-label">Couverts ${y}</div><div class="kpi-value" style="font-size:20px;">${cv.toLocaleString('fr-FR')}</div></div>
+    </div>`;
+  if(!chAnn)return;
+  const months=[],labels=[];
+  for(let m=0;m<12;m++){months.push(`${y}-${String(m+1).padStart(2,'0')}`);labels.push(new Date(y,m,1).toLocaleDateString('fr-FR',{month:'short'}));}
+  chAnn.data.labels=labels;
+  chAnn.data.datasets[0].data=months.map(m=>DB.recettes.filter(r=>mkey(r.date)===m).reduce((s,r)=>s+r.montant,0));
+  chAnn.data.datasets[1].data=months.map(m=>DB.depenses.filter(d=>mkey(d.date)===m).reduce((s,d)=>s+d.ttc,0));
+  chAnn.update();
+}
+
+/* ===== EXPORTS ===== */
+function dlCSV(content,name){const b=new Blob(['\ufeff'+content],{type:'text/csv;charset=utf-8;'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+function dlTXT(content,name){const b=new Blob([content],{type:'text/plain;charset=utf-8;'});const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+function exportBilan(){
+  const m=document.getElementById('ex-bilan').value||curM();
+  const recs=DB.recettes.filter(r=>mkey(r.date)===m),deps=DB.depenses.filter(d=>mkey(d.date)===m);
+  let csv='Type;Date;Détail;Canal;Catégorie;Statut;Récurrence;HT;TVA %;TVA €;TTC;Mode;N° Facture;Note\n';
+  recs.forEach(r=>{const ht=r.montant/(1+r.tva/100),tva=r.montant-ht;csv+=`Recette;${r.date};Service ${r.service};${clabel2(r.canal||'place')};;OK;;${ht.toFixed(2)};${r.tva};${tva.toFixed(2)};${r.montant.toFixed(2)};${r.mode};;${r.note||''}\n`;});
+  deps.forEach(d=>csv+=`Dépense;${d.date};${d.fourn||''};—;${clabel(d.cat)};${slabel(d.statut||'paye')};${d.recurrence||''};${d.ht.toFixed(2)};${d.tva};${(d.ht*d.tva/100).toFixed(2)};${d.ttc.toFixed(2)};${d.mode||''};${d.facture||''};${d.note||''}\n`);
+  dlCSV(csv,`bilan-${m}.csv`);toast('Bilan exporté !','success');
+}
+function exportRec(){
+  const m=document.getElementById('ex-rec').value||curM();
+  const rows=DB.recettes.filter(r=>mkey(r.date)===m).sort((a,b)=>a.date.localeCompare(b.date));
+  let csv='Date;Service;Canal;TypeJournée;Couverts;Mode;TVA%;TTC;HT;TVA collectée;Note\n';
+  rows.forEach(r=>{const ht=r.montant/(1+r.tva/100);csv+=`${r.date};${r.service};${r.canal||'place'};${r.typeJour||'semaine'};${r.couverts||0};${r.mode};${r.tva};${r.montant.toFixed(2)};${ht.toFixed(2)};${(r.montant-ht).toFixed(2)};${r.note||''}\n`;});
+  dlCSV(csv,`recettes-${m}.csv`);toast('Recettes exportées !','success');
+}
+function exportTVA(){
+  const p=document.getElementById('tva-period').value||curM();
+  const recs=DB.recettes.filter(r=>mkey(r.date)===p),deps=DB.depenses.filter(d=>mkey(d.date)===p);
+  const tc=recs.reduce((s,r)=>s+(r.montant-r.montant/(1+r.tva/100)),0);
+  const td=deps.reduce((s,d)=>s+d.ht*d.tva/100,0);
+  let csv=`Récapitulatif TVA;${p}\nTVA collectée (ligne 08);${tc.toFixed(2)}\nTVA déductible (ligne 20);${td.toFixed(2)}\nSolde à reverser;${(tc-td).toFixed(2)}\n`;
+  dlCSV(csv,`tva-${p}.csv`);toast('TVA exportée !','success');
+}
+function exportFEC(){
+  const m=document.getElementById('ex-fec').value||curM();
+  const [y,mo]=m.split('-');
+  const recs=DB.recettes.filter(r=>mkey(r.date)===m);
+  const deps=DB.depenses.filter(d=>mkey(d.date)===m);
+  // FEC format : JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|CompAuxNum|CompAuxLib|PieceRef|PieceDate|EcritureLib|Debit|Credit|EcritureLet|DateLet|ValidDate|Montantdevise|Idevise
+  let lines=['JournalCode|JournalLib|EcritureNum|EcritureDate|CompteNum|CompteLib|CompAuxNum|CompAuxLib|PieceRef|PieceDate|EcritureLib|Debit|Credit|EcritureLet|DateLet|ValidDate|Montantdevise|Idevise'];
+  let n=1;
+  const fecDate=s=>s.replace(/-/g,'');
+  recs.forEach(r=>{
+    const ht=r.montant/(1+r.tva/100);const tva=r.montant-ht;const d=fecDate(r.date);
+    lines.push(`VTE|Ventes|VTE${String(n).padStart(6,'0')}|${d}|706000|Ventes de repas|||${r.id}|${d}|Service ${r.service}|0.00|${ht.toFixed(2)}|||${d}||`);
+    lines.push(`VTE|Ventes|VTE${String(n).padStart(6,'0')}|${d}|445710|TVA collectée|||${r.id}|${d}|TVA ${r.tva}%|0.00|${tva.toFixed(2)}|||${d}||`);
+    lines.push(`VTE|Ventes|VTE${String(n).padStart(6,'0')}|${d}|411000|Clients|||${r.id}|${d}|Encaissement ${r.mode}|${r.montant.toFixed(2)}|0.00|||${d}||`);
+    n++;
+  });
+  deps.forEach(d=>{
+    const tva=d.ht*d.tva/100;const dd=fecDate(d.date);
+    lines.push(`ACH|Achats|ACH${String(n).padStart(6,'0')}|${dd}|${d.cat==='matieres'||d.cat==='boissons'?'601000':'615000'}|${clabel(d.cat)}|||${d.facture||d.id}|${dd}|${d.fourn||'Fournisseur'}|${d.ht.toFixed(2)}|0.00|||${dd}||`);
+    if(tva>0)lines.push(`ACH|Achats|ACH${String(n).padStart(6,'0')}|${dd}|445660|TVA déductible|||${d.facture||d.id}|${dd}|TVA ${d.tva}%|${tva.toFixed(2)}|0.00|||${dd}||`);
+    lines.push(`ACH|Achats|ACH${String(n).padStart(6,'0')}|${dd}|401000|Fournisseurs|||${d.facture||d.id}|${dd}|${d.fourn||'Fournisseur'}|0.00|${d.ttc.toFixed(2)}|||${dd}||`);
+    n++;
+  });
+  dlTXT(lines.join('\n'),`FEC_${y}${mo}.txt`);toast('FEC exporté !','success');
+}
+function backup(){
+  const clone={...DB,recettes:DB.recettes.map(r=>({...r,photo:undefined})),depenses:DB.depenses.map(d=>({...d,photo:undefined}))};
+  const b=new Blob([JSON.stringify(clone,null,2)],{type:'application/json'});
+  const u=URL.createObjectURL(b);const a=document.createElement('a');a.href=u;a.download=`khmercompta-${today()}.json`;a.click();URL.revokeObjectURL(u);
+  toast('Sauvegarde téléchargée !','success');
+}
+function restore(e){
+  const f=e.target.files[0];if(!f)return;
+  const r=new FileReader();r.onload=ev=>{try{DB=JSON.parse(ev.target.result);DB.settings=DB.settings||{pin:'1234',objectifCA:0};save();initApp();toast('Données restaurées !','success');}catch(err){toast('Fichier invalide.','error');}};r.readAsText(f);
+}
+
+/* ===== CLAVIER ===== */
+document.addEventListener('keydown',e=>{
+  if(!document.getElementById('app').classList.contains('visible')){
+    if(e.key>='0'&&e.key<='9')pinPress(parseInt(e.key));
+    if(e.key==='Backspace')pinDelete();
+    if(e.key==='Escape')pinClear();
+  }
+});
+
+load();
+// Init boutons login au démarrage
+document.getElementById('btn-cambodge').style.cssText="flex:1;padding:10px;background:var(--gold);color:#05050D;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;";
+document.getElementById('btn-bayon').style.cssText="flex:1;padding:10px;background:var(--bg-input);color:var(--text-sec);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;";
+</script>
+</body>
+</html>
