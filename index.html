@@ -946,12 +946,7 @@ function closeSidebar(){
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('sidebar-overlay').classList.remove('open');
 }
-// Fermer sidebar auto au changement de page sur mobile
-const _goOrig = window.go;
-window.go = function(page){
-  if(window.innerWidth<=768) closeSidebar();
-  if(_goOrig) _goOrig(page);
-};
+
 </script><script>
 /* ===== DB ===== */
 let DB={recettes:[],depenses:[],caisse:[],recurrents:[],settings:{pin:'1234',objectifCA:0}};
@@ -1112,6 +1107,7 @@ function renderParametres(){
 
 /* ===== NAV ===== */
 function go(page){
+  if(window.innerWidth<=768) closeSidebar();
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
