@@ -207,7 +207,20 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
   .tva-summary{grid-template-columns:1fr;}
   .rapport-grid{grid-template-columns:1fr;}
 }
-</style>
+@media(max-width:768px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:300;transform:translateX(-100%);transition:transform .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.6);}
+  .sidebar.open{transform:translateX(0);}
+  #app.visible{flex-direction:column;}
+  .main-content{width:100%!important;}
+  .sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:299;}
+  .sidebar-overlay.open{display:block;}
+  .hamburger{display:flex;}
+}
+.hamburger{display:none;align-items:center;justify-content:center;width:36px;height:36px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--rs);cursor:pointer;flex-shrink:0;}
+.hamburger span{display:block;width:16px;height:2px;background:var(--text);position:relative;transition:all .2s;}
+.hamburger span::before,.hamburger span::after{content:'';position:absolute;width:16px;height:2px;background:var(--text);left:0;transition:all .2s;}
+.hamburger span::before{top:-5px;}
+.hamburger span::after{top:5px;}</style>
 </head>
 <body>
 
@@ -509,7 +522,8 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 
 <!-- APP SHELL -->
 <div id="app">
-  <aside class="sidebar">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+  <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand" style="cursor:pointer;" onclick="go('parametres')" title="Paramètres">
       <div style="font-size:10px;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px;" id="sidebar-restau-tag">Ô Petit Cambodge</div>
       <div class="brand-name">Khmer Compta</div>
@@ -580,6 +594,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
           <div class="page-sub" id="dash-date"></div>
         </div>
         <div style="display:flex;gap:10px;align-items:center;">
+          <button class="hamburger" onclick="toggleSidebar()" style="margin-right:4px;"><span></span></button>
           <div style="display:flex;align-items:center;gap:8px;">
             <span style="font-size:12px;color:var(--text-muted);">Objectif CA :</span>
             <input type="number" id="objectif-ca" class="form-ctrl" style="width:110px;padding:7px 10px;font-size:13px;" placeholder="ex: 18000" onchange="saveObjectif()">
@@ -911,7 +926,7 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
       <!-- Infos application -->
       <div style="margin-top:20px;text-align:center;font-size:12px;color:var(--text-muted);line-height:2;">
         Khmer Compta v2 · Développé par <span style="color:var(--gold);">Nine Technologies</span><br>
-        07 80 19 30 96 · ninetechnologies@outlook.fr
+        07 80 19 30 96 · <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="89e7e0e7ecfdeceae1e7e6e5e6eee0ecfac9e6fcfde5e6e6e2a7effb">[email&#160;protected]</a>
       </div>
     </section>
 
@@ -919,7 +934,25 @@ html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);colo
 </div>
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js">
+// ── SIDEBAR MOBILE ──
+function toggleSidebar(){
+  const s=document.getElementById('sidebar');
+  const o=document.getElementById('sidebar-overlay');
+  s.classList.toggle('open');
+  o.classList.toggle('open');
+}
+function closeSidebar(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+}
+// Fermer sidebar auto au changement de page sur mobile
+const _goOrig = window.go;
+window.go = function(page){
+  if(window.innerWidth<=768) closeSidebar();
+  if(_goOrig) _goOrig(page);
+};
+</script><script>
 /* ===== DB ===== */
 let DB={recettes:[],depenses:[],caisse:[],recurrents:[],settings:{pin:'1234',objectifCA:0}};
 let pinVal='',chRev=null,chDep=null,chAnn=null;
@@ -1628,7 +1661,4 @@ document.addEventListener('keydown',e=>{
 load();
 // Init boutons login au démarrage
 document.getElementById('btn-cambodge').style.cssText="flex:1;padding:10px;background:var(--gold);color:#05050D;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;border:none;cursor:pointer;";
-document.getElementById('btn-bayon').style.cssText="flex:1;padding:10px;background:var(--bg-input);color:var(--text-sec);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:none;cursor:pointer;";
-</script>
-</body>
-</html>
+doc
